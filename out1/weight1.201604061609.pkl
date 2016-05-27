@@ -1,0 +1,1 @@
+../../cnnspot/out1/weight1c.201604061609.pkl
