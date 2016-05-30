@@ -38,34 +38,37 @@ if(not 'qqq_trn' in locals()):
 nn,ny,nx,nl = qqq_trn.shape
 print('nn ny nx nl',nn,ny,nx,nl)
 
-if(stamp1=='NA'):
-    ww = tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_RGB,12],stddev=0.05))
-else:
-    aa=1
-    #dict_tmp = pickle.load(open(path_src,'rb'))
-    #ww = dict_tmp['ww']
-
 nf_RGB = 3
-lambda_s = 1e-3
+lambda_s = 1e+4
 nf_risa = 24
 fs_1 = 8
+
+if(stamp1=='NA'):
+    ww = tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_RGB,nf_risa],stddev=0.05))
+else:
+    file_ww = 'ww_risa.{}.pkl'.format(stamp1)
+    path_ww = os.path.join('out1',file_ww)
+    tmp = pickle.load(open(path_ww,'rb'))
+    ww = tf.Variable(tmp)
+    #dict_tmp = pickle.load(open(path_src,'rb'))
+    #ww = dict_tmp['ww']
 
 tf_input = tf.placeholder(tf.float32, [None,ny,nx,nl])
 
 tf_conv1 = tf.nn.conv2d(tf_input,ww,strides=[1,1,1,1],padding='VALID')
 tf_deconv1 = tf.nn.conv2d_transpose(value=tf_conv1,filter=ww,output_shape=[batch_size,ny,nx,nl],strides=[1,1,1,1],padding='VALID')
-## tf_error = tf.reduce_mean(tf.square(tf_deconv1 - tf_input))
-tf_error = tf.nn.l2_loss(tf_deconv1 - tf_input)
+tf_error = tf.reduce_mean(tf.square(tf_deconv1 - tf_input))
+## tf_error = tf.nn.l2_loss(tf_deconv1 - tf_input)
 
 tf_simple1 = tf.square(tf_conv1)
 seg24 = tf.constant([0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11])
 tf_t_simple1 = tf.transpose(tf_simple1)
 tf_sparce1 = tf.reduce_mean(tf.sqrt(tf.segment_sum(tf_t_simple1,seg24)))
 
-tf_cost = tf_error + lambda_s * tf_sparce1
+tf_score = tf_error * lambda_s + tf_sparce1
 
 optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
-train = optimizer.minimize(tf_cost)
+train = optimizer.minimize(tf_score)
 
 sess.run(tf.initialize_all_variables())
 
@@ -75,21 +78,22 @@ iii_batches = np.split(iii_nn,iii_bin)
 
 for tt in range(tmax):
     if(tt % tprint==0):
-        tmp = [tf_error.eval({tf_input: qqq_trn[iii,]}) for iii in iii_batches]
-        error_out = np.mean(tmp)
-        print(tt,error_out)
+        tmp = [sess.run((tf_error,tf_sparce1,tf_score),{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
+        error_out = np.mean([xxx[0] for xxx in tmp])
+        sparc_out = np.mean([xxx[1] for xxx in tmp])
+        score_out = np.mean([xxx[2] for xxx in tmp])
+        print('tt, error, sparce, score',tt,error_out,sparc_out,score_out)
     np.random.shuffle(iii_nn)
     iii_batches = np.split(iii_nn,iii_bin)
     for iii in iii_batches:
         sess.run(train,feed_dict={tf_input: qqq_trn[iii,]})
 
-tmp = [sess.run(tf_error,{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
-error_out = np.mean(tmp)
-print(error_out)
-tmp = [sess.run(tf_sparce1,{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
-sparce1_out = np.mean(tmp)
-print(sparce1_out)
-
+if(tt % tprint != 0):
+    tmp = [sess.run((tf_error,tf_sparce1,tf_score),{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
+    error_out = np.mean([xxx[0] for xxx in tmp])
+    sparc_out = np.mean([xxx[1] for xxx in tmp])
+    score_out = np.mean([xxx[2] for xxx in tmp])
+    print('tt error, sparce, score',tmax,error_out,sparc_out,score_out)
 
 img_org = tensorflow_util.get_image_from_qqq(qqq_trn[0:8])
 
@@ -101,6 +105,7 @@ myutil.showsave(img_cmp,file_img="vld_risa.jpg")
 print('error:',np.mean((qqq_deconv1 - qqq_trn[0:batch_size])**2))
 
 ww_out = ww.eval()
-myutil.saveObject(ww_out,'ww_out.{}.pkl'.format(stamp))
+myutil.saveObject(ww_out,'ww_risa.{}.pkl'.format(stamp))
 
-
+myutil.timestamp()
+print('stamp1 = \'{}\''.format(stamp))
