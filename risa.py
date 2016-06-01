@@ -65,7 +65,7 @@ seg24 = tf.constant([0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11])
 tf_t_simple1 = tf.transpose(tf_simple1)
 tf_sparce1 = tf.reduce_mean(tf.sqrt(tf.segment_sum(tf_t_simple1,seg24)))
 
-tf_score = tf_error * lambda_s + tf_sparce1
+tf_score = tf_error #* lambda_s + tf_sparce1
 
 optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
 train = optimizer.minimize(tf_score)
