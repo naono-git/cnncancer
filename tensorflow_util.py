@@ -3,6 +3,28 @@ import re
 import numpy as np
 from PIL import Image
 
+def get_image_from_ww(ww):
+    sss = ww.shape
+    if(len(sss)==2):
+        ny,nx = sss
+        nl = 1
+        
+    if(len(sss)>=3):
+        ny,nx,nl = sss[0:3]
+        rgb = np.empty((ny,nx,3),dtype='uint8')
+        if(nl < 3):
+            wmin = np.min(ww[:,:,0])
+            wmax = np.max(ww[:,:,0])
+            rgb[:,:,] = ((ww[:,:,0]-wmin) / (wmax-wmin) * 255)[:,:,np.newaxis]
+        else:
+            for cc in range(3):
+                wmin = np.min(ww[:,:,cc])
+                wmax = np.max(ww[:,:,cc])
+                rgb[:,:,cc] = (ww[:,:,cc]-wmin) / (wmax-wmin) * 255
+    img_tmp = Image.fromarray(rgb)
+    return(img_tmp)
+
+
 rwb = np.empty((256,3),dtype='uint8')
 rwb[0:128,0]=255
 rwb[0:128,1]=np.arange(0,255,2)
