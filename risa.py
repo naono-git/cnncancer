@@ -60,12 +60,20 @@ tf_deconv1 = tf.nn.conv2d_transpose(value=tf_conv1,filter=ww,output_shape=[batch
 tf_error = tf.reduce_mean(tf.square(tf_deconv1 - tf_input))
 ## tf_error = tf.nn.l2_loss(tf_deconv1 - tf_input)
 
+qqq = tf.square(tf_conv1)
+ooo = tf.reduce_sum(qqq,3,keep_dims=True)
+rrr = qqq / (tf.tile(ooo,[1,1,1,nf_risa])+1e-16)
+tf_local_entropy1 = tf.reduce_sum(rrr * (-tf.log(rrr+1e-16)),3)
+tf_entropy = tf.reduce_mean(tf_local_entropy1)
+                
 tf_simple1 = tf.square(tf_conv1)
 seg24 = tf.constant([0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11])
 tf_t_simple1 = tf.transpose(tf_simple1)
 tf_sparce1 = tf.reduce_mean(tf.sqrt(tf.segment_sum(tf_t_simple1,seg24)))
 
-tf_score = tf_error #* lambda_s + tf_sparce1
+# tf_score = tf_error 
+# tf_score = tf_error * lambda_s + tf_sparce1
+tf_score = lambda_s * tf_error + tf_entropy
 
 optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
 train = optimizer.minimize(tf_score)
@@ -100,7 +108,7 @@ img_org = tensorflow_util.get_image_from_qqq(qqq_trn[0:8])
 qqq_deconv1 = tf_deconv1.eval({tf_input: qqq_trn[0:batch_size]})
 img_out = tensorflow_util.get_image_from_qqq(qqq_deconv1[0:8])
 img_cmp = myutil.rbind_image(img_org,img_out)
-myutil.showsave(img_cmp,file_img="vld_risa.jpg")
+myutil.showsave(img_cmp,file_img="vld_risa.{}.jpg".format(stamp))
 
 print('error:',np.mean((qqq_deconv1 - qqq_trn[0:batch_size])**2))
 
@@ -109,3 +117,16 @@ myutil.saveObject(ww_out,'ww_risa.{}.pkl'.format(stamp))
 
 myutil.timestamp()
 print('stamp1 = \'{}\''.format(stamp))
+
+if(False):
+    img_tmp1 = get_image_from_ww(ww_out[:,:,:,0])
+    img_tmp2 = get_image_from_ww(ww_out[:,:,:,1])
+    img_tmp3 = myutil.rbind_image(img_tmp1,img_tmp2)
+    img_tmp4 = img_tmp3
+    for bb in range(1,12):
+        img_tmp1 = get_image_from_ww(ww_out[:,:,:,bb*2])
+        img_tmp2 = get_image_from_ww(ww_out[:,:,:,bb*2+1])
+        img_tmp3 = myutil.rbind_image(img_tmp1,img_tmp2)
+        img_tmp4 = myutil.cbind_image(img_tmp4,img_tmp3)
+    myutil.showsave(img_tmp4,file_img='tmp.jpg')
+# endif
