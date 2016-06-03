@@ -38,7 +38,7 @@ lambda_s = 1e+4
 nf_risa1 = 24
 fs_1 = 8
 fs_2 = 4
-nf_risa2 = 24
+nf_risa2 = 96
 
 
 if(stamp1=='NA'):
@@ -105,3 +105,9 @@ if(tt % tprint != 0):
     score_out = np.mean([xxx[2] for xxx in tmp])
     print('tt {} error {} entropy {}  score {}'.format(tt,error_out,entro_out,score_out))
 
+
+ww2_out = ww2.eval()
+myutil.saveObject(ww2_out,'ww2_risa.{}.pkl'.format(stamp))
+
+myutil.timestamp()
+print('stamp2 = \'{}\''.format(stamp))

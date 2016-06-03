@@ -39,8 +39,8 @@ nn,ny,nx,nl = qqq_trn.shape
 print('nn ny nx nl',nn,ny,nx,nl)
 
 nf_RGB = 3
-lambda_s = 1e+4
-nf_risa = 24
+lambda_s = 1e+3
+nf_risa = 32
 fs_1 = 8
 
 if(stamp1=='NA'):
@@ -86,22 +86,22 @@ iii_batches = np.split(iii_nn,iii_bin)
 
 for tt in range(tmax):
     if(tt % tprint==0):
-        tmp = [sess.run((tf_error,tf_sparce1,tf_score),{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
+        tmp = [sess.run((tf_error,tf_entropy,tf_score),{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
         error_out = np.mean([xxx[0] for xxx in tmp])
         sparc_out = np.mean([xxx[1] for xxx in tmp])
         score_out = np.mean([xxx[2] for xxx in tmp])
-        print('tt, error, sparce, score',tt,error_out,sparc_out,score_out)
+        print('tt error sparce score',tt,error_out,sparc_out,score_out)
     np.random.shuffle(iii_nn)
     iii_batches = np.split(iii_nn,iii_bin)
     for iii in iii_batches:
         sess.run(train,feed_dict={tf_input: qqq_trn[iii,]})
 
 if(tt % tprint != 0):
-    tmp = [sess.run((tf_error,tf_sparce1,tf_score),{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
+    tmp = [sess.run((tf_error,tf_entropy,tf_score),{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
     error_out = np.mean([xxx[0] for xxx in tmp])
-    sparc_out = np.mean([xxx[1] for xxx in tmp])
+    entropy_out = np.mean([xxx[1] for xxx in tmp])
     score_out = np.mean([xxx[2] for xxx in tmp])
-    print('tt error, sparce, score',tmax,error_out,sparc_out,score_out)
+    print('tt error sparce score',tmax,error_out,entropy_out,score_out)
 
 img_org = tensorflow_util.get_image_from_qqq(qqq_trn[0:8])
 
