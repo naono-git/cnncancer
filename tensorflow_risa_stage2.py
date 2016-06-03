@@ -38,7 +38,7 @@ lambda_s = 1e+4
 nf_risa1 = 24
 fs_1 = 8
 fs_2 = 4
-nf_risa2 = 96
+nf_risa2 = 24
 
 
 if(stamp1=='NA'):
@@ -67,15 +67,25 @@ tf_deconv1 = tf.nn.conv2d_transpose(value=tf_deconv2,filter=ww1,output_shape=[ba
 
 tf_error = tf.reduce_mean(tf.square(tf_deconv1 - tf_input))
 
+##
+## risa
+## 
+tf_simple2 = tf.square(tf_conv2)
+seg24 = tf.constant([0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11])
+tf_t_simple2 = tf.transpose(tf_simple2)
+tf_sparce = tf.reduce_mean(tf.sqrt(tf.segment_sum(tf_t_simple2,seg24)))
+
+##
+##
 qqq = tf.square(tf_conv2)
 ooo = tf.reduce_sum(qqq,3,keep_dims=True)
 rrr = qqq / (tf.tile(ooo,[1,1,1,nf_risa2])+1e-16)
 tf_local_entropy = tf.reduce_sum(rrr * (-tf.log(rrr+1e-16)),3)
 tf_entropy = tf.reduce_mean(tf_local_entropy)
                 
-# tf_score = tf_error #* lambda_s + tf_sparce1
-# tf_score = tf_error * lambda_s + tf_sparce1
-tf_score = lambda_s * tf_error + tf_entropy
+# tf_score = tf_error #* lambda_s + tf_sparce
+tf_score = tf_error * lambda_s + tf_sparce
+# tf_score = lambda_s * tf_error + tf_entropy
 
 optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
 train = optimizer.minimize(tf_score)
@@ -88,22 +98,22 @@ iii_batches = np.split(iii_nn,iii_bin)
 
 for tt in range(tmax):
     if(tt % tprint==0):
-        tmp = [sess.run((tf_error,tf_entropy,tf_score),{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
+        tmp = [sess.run((tf_error,tf_sparce,tf_score),{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
         error_out = np.mean([xxx[0] for xxx in tmp])
-        entro_out = np.mean([xxx[1] for xxx in tmp])
+        sparce_out = np.mean([xxx[1] for xxx in tmp])
         score_out = np.mean([xxx[2] for xxx in tmp])
-        print('tt {} error {} entropy {}  score {}'.format(tt,error_out,entro_out,score_out))
+        print('tt {} error {} sparce {}  score {}'.format(tt,error_out,sparce_out,score_out))
     np.random.shuffle(iii_nn)
     iii_batches = np.split(iii_nn,iii_bin)
     for iii in iii_batches:
         sess.run(train,feed_dict={tf_input: qqq_trn[iii,]})
 
 if(tt % tprint != 0):
-    tmp = [sess.run((tf_error,tf_entropy,tf_score),{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
+    tmp = [sess.run((tf_error,tf_sparce,tf_score),{tf_input: qqq_trn[iii,]}) for iii in iii_batches]
     error_out = np.mean([xxx[0] for xxx in tmp])
-    entro_out = np.mean([xxx[1] for xxx in tmp])
+    sparce_out = np.mean([xxx[1] for xxx in tmp])
     score_out = np.mean([xxx[2] for xxx in tmp])
-    print('tt {} error {} entropy {}  score {}'.format(tt,error_out,entro_out,score_out))
+    print('tt {} error {} sparce {}  score {}'.format(tt,error_out,sparce_out,score_out))
 
 
 ww2_out = ww2.eval()
