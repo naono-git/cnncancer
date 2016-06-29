@@ -7,12 +7,18 @@ print('train stacked autoencoder stage 1')
 import os
 import sys
 import csv
-import numpy as np
 import pickle
-import myutil
+import numpy as np
 from PIL import Image
+
+
 import tensorflow as tf
 import tensorflow_ae_base
+
+from tensorflow_ae_base import *
+import tensorflow_util
+
+import myutil
 
 exec(open('extern_params.py').read())
 
@@ -35,8 +41,8 @@ exec(open('tensorflow_ae_stage1.py').read())
 # setup optimizer
 #
 qqq_input = tf.placeholder(tf.float32, [None,ny,nx,nl])
-qqq_encode1 = get_encode1(qqq_input)
-qqq_deconv1 = get_deconv1(qqq_encode1)
+qqq_encode1 = get_encode1(qqq_input,weight1)
+qqq_deconv1 = get_deconv1(qqq_encode1,weight1)
 mean_error = tf.reduce_mean(tf.square(qqq_deconv1 - qqq_input))
 local_entropy = get_local_entropy_encode1(qqq_encode1)
 mean_entropy = tf.reduce_mean(local_entropy)
