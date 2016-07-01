@@ -77,7 +77,7 @@ network_params = {
     'nf_conv1'   : 3,
     'nf_encode1' : 6,
     'nf_conv2'   : 6,
-    'nf_encode2' : 6,
+    'nf_encode2' : 12,
     'nf_conv3'   : 12,
     'nf_encode3' : 12,
     'nf_conv4'   : 4,

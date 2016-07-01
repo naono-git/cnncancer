@@ -40,9 +40,9 @@ exec(open('tensorflow_ae_stage1.py').read())
 #
 # setup optimizer
 #
-qqq_input = tf.placeholder(tf.float32, [None,ny,nx,nl])
-qqq_encode1 = get_encode1(qqq_input,weight1)
-qqq_deconv1 = get_deconv1(qqq_encode1,weight1)
+qqq_input = tf.placeholder(tf.float32, [batch_size,ny,nx,nl])
+qqq_encode1 = get_encode1(qqq_input)
+qqq_deconv1 = get_deconv1(qqq_encode1)
 mean_error = tf.reduce_mean(tf.square(qqq_deconv1 - qqq_input))
 local_entropy = get_local_entropy_encode1(qqq_encode1)
 mean_entropy = tf.reduce_mean(local_entropy)
@@ -70,10 +70,7 @@ for tt in range(tmax):
 #
 # save parameters
 #
-weight1_fin = {k:sess.run(v) for k,v in weight1.items()}
-bias1_fin = {k:sess.run(v) for k,v, in bias1.items()}
-myutil.saveObject(weight1_fin,'weight1.{}.pkl'.format(stamp))
-myutil.saveObject(bias1_fin,'bias1.{}.pkl'.format(stamp))
+save_stage1()
 
 myutil.timestamp()
 print('stamp1 = \'{}\''.format(stamp))

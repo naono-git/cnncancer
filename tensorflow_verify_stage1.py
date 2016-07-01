@@ -22,6 +22,8 @@ exec(open('extern_params.py').read())
 
 ss = 512
 aa = 1
+batch_size = 8
+
 if(not 'qqq_trn' in locals() or nx != ss):
     dir_input = '/Users/nono/Documents/data/tissue_images/input_w512/'
     file_input = 'qqq_trn_w512_{}.npy'.format(aa)
@@ -35,26 +37,26 @@ print('nn ny nx nl',nn,ny,nx,nl)
 # bias1c.201604061609.pkl
 exec(open('tensorflow_ae_stage1.py').read())
 
-tf_input   = tf.placeholder(tf.float32, [None,ny,nx,nl])
-tf_encode1 = get_encode1(tf_input)
-tf_deconv1 = get_deconv1(tf_encode1)
-
-sess.run(tf.initialize_all_variables())
-
 iii_vld = (0,7,9,5,1,3,4,6)
 print(iii_vld)
 qqq_vld = qqq_trn[iii_vld,]
+
+
+tf_encode1 = get_encode1(qqq_vld)
+tf_deconv1 = get_deconv1(tf_encode1)
+
+sess.run(tf.initialize_all_variables())
 
 ##
 ## visualize encode
 ##
 img_org = tensorflow_util.get_image_from_qqq(qqq_vld)
-img_org.show()
 
-qqq_encode1 = tf_encode1.eval({tf_input: qqq_vld})
-qqq_deconv1 = tf_deconv1.eval({tf_input: qqq_vld})
+qqq_encode1 = tf_encode1.eval()
+qqq_deconv1 = tf_deconv1.eval()
 img_out = tensorflow_util.get_image_from_qqq(qqq_deconv1)
-img_out.show()
+img_cmp = myutil.rbind_image(img_org,img_out)
+img_cmp.show()
 
 img_enc1 = tensorflow_util.get_image_from_encode(qqq_encode1)
 
