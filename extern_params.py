@@ -110,7 +110,6 @@ for k,v in network_params.items():
 key1 = ['conv1', 'encode1', 'hidden1', 'deconv1']
 key2 = ['conv2', 'encode2', 'hidden2', 'deconv2']
 key3 = ['conv3', 'encode3', 'hidden3', 'deconv3']
-key4 = ['conv4']
 
 #
 # setup tensorflow session

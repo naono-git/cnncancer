@@ -28,7 +28,13 @@ exec(open('extern_params.py').read())
 ss = 32 # sample size
 na = 4
 
-if((not 'qqq_encode1' in locals()) or (not qqq_encode1.shape[2] == ss)):
+hoge = ('qqq_encode1' in locals())
+if(hoge):
+    fuga = (not qqq_encode1.shape[2] == ss)
+else:
+    fuga = False
+
+if(fuga):
     tmp = []
     for aa in range(na):
         file_input = 'qqq_encode1_tcga_w{}_{}.{}.npy'.format(ss,aa+1,stamp1)

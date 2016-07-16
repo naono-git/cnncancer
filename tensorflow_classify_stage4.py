@@ -6,15 +6,17 @@ print('setup classyfiler stage 4')
 
 nf_conv4 = 24
 nf_encode4 = 3
+key4 = ['conv','encode']
+
 if(stamp4=='NA'):
     print('initialize w4 and b4 randomly')
     weight4 = {
-        'conv':   tf.Variable(tf.truncated_normal([16,16,12,24],stddev=0.05)),
-        'encode': tf.Variable(tf.truncated_normal([16,16,24,3],stddev=0.05)),
+        'conv':   tf.Variable(tf.truncated_normal([16,16,12,24],stddev=0.1)),
+        'encode': tf.Variable(tf.truncated_normal([16,16,24,3],stddev=0.1)+1e-3),
     }
     bias4 = {
-        'conv':   tf.Variable(tf.zeros([nf_conv4])),
-        'encode': tf.Variable(tf.zeros([nf_encode4])),
+        'conv':   tf.Variable(tf.zeros([nf_conv4])+0.1),
+        'encode': tf.Variable(tf.zeros([nf_encode4])+10),
     }
 else:
     print('load w4 and b4 from',stamp4)
@@ -66,6 +68,3 @@ def save_stage4():
     myutil.saveObject(weight4_fin,'weight4.{}.pkl'.format(stamp))
     myutil.saveObject(bias4_fin,'bias4.{}.pkl'.format(stamp))
     return([weight4_fin,bias4_fin])
-
-
-

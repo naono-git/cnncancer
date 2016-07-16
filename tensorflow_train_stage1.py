@@ -8,11 +8,17 @@ import os
 import sys
 import csv
 import numpy as np
+import numpy as np
 import pickle
-import myutil
 from PIL import Image
+
 import tensorflow as tf
 import tensorflow_ae_base
+
+from tensorflow_ae_base import *
+import tensorflow_util
+
+import myutil
 
 exec(open('extern_params.py').read())
 
@@ -71,4 +77,3 @@ myutil.saveObject(bias1_fin,'bias1.{}.pkl'.format(stamp))
 
 myutil.timestamp()
 print('stamp1 = \'{}\''.format(stamp))
-
