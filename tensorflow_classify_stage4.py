@@ -59,6 +59,25 @@ def get_local_entropy_encode4(qqq):
     tmp = tf.reduce_sum(rrr * (-tf.log(rrr+1e-16)),4)
     return(tmp)
 
+def verify_class(xxx,yyy):
+    nn = xxx.shape[0]
+    if(nn != len(yyy)):
+        print("xxx.shape[0]:",xxx.shape[0],"!=len(yyy):",len(yyy),"\n")
+        return(0)
+    iii_bin = np.arange(batch_size,nn,batch_size)
+    iii_nn = np.arange(nn)
+    iii_batches = np.split(iii_nn,iii_bin)
+
+    tmpx = []
+    tmpy = []
+    for iii in iii_batches:
+        tmp = tf_encode4.eval({tf_encode2:xxx[iii,],tf_yyy:yyy[iii]})
+        tmpx.append(np.argmax(tmp[:,0,0,:],axis=1))
+        tmpy.append(yyy[iii])
+    hoge = np.hstack(tmpx)
+    fuga = np.hstack(tmpy)
+    return(np.transpose(np.vstack((hoge,fuga))))
+
 #
 # save network parameters
 #
