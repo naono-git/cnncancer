@@ -26,8 +26,10 @@ trainable1 = True
 trainable2 = True
 trainable3 = True
 trainable4 = True
-tmax = 100
-tprint = 10
+tmax = 1000
+tprint = 100
+
+exec(open('make_tcga_sample.py').read())
 
 del(qqq_trn)
 exec(open('tensorflow_train_stage1.py').read())
@@ -44,8 +46,10 @@ exec(open('make_tcga_encoded2.py').read())
 
 exec(open('tensorflow_train_stage3.enc.py').read())
 stamp3 = stamp
-trainable3 = False
+# trainable3 = False
 
+exec(open('make_tcga_encoded2_2048.py').read())
 del(qqq_trn)
-exec(open('tensorflow_train_stage4.py').read())
+
+exec(open('tensorflow_train_stage4_encoded2.py').read())
 stamp4 = stamp
