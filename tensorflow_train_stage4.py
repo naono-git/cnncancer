@@ -91,3 +91,17 @@ for tt in range(tmax):
 
 if(tt < tmax):
     print(tmax,tf_loss.eval({tf_input: qqq_trn, tf_yyy: yyy_trn}))
+
+
+#
+# save parameters
+#
+weight4_fin = {k:sess.run(v) for k,v in weight4.items()}
+bias4_fin = {k:sess.run(v) for k,v, in bias4.items()}
+myutil.saveObject(weight4_fin,'weight4.{}.pkl'.format(stamp))
+myutil.saveObject(bias4_fin,'bias4.{}.pkl'.format(stamp))
+
+myutil.timestamp()
+print('stamp4 = \'{}\''.format(stamp))
+
+

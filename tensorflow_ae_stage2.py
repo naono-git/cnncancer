@@ -32,7 +32,7 @@ else:
     path_b2 = os.path.join('out1',file_b2)
 
     if(not os.path.exists(path_w2) or not os.path.exists(path_b2)):
-        myutil.getRemoteFile([file_w2,file_b2])
+        myutil.getRemoteFile([file_w2,file_b2],dirname='Documents/cnncancer/out1')
 
     weight2 = tensorflow_ae_base.load_tf_variable(path_w2,key2,trainable=trainable2)
     bias2   = tensorflow_ae_base.load_tf_variable(path_b2,key2,trainable=trainable2)
