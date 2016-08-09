@@ -46,5 +46,5 @@ for aa in range(na) :
     sess.run(tf.initialize_all_variables())
     
     qqq_encode1 = np.vstack([sess.run(tf_encode1,{tf_input: qqq_tmp[iii,]}) for iii in iii_batches])
-    ss = qqq_encode1.shape[2]
-    np.save('out1/qqq_encode1_tcga_w{}_{}.{}.npy'.format(ss,aa+1,stamp1),qqq_encode1)
+    ss2 = qqq_encode1.shape[2]
+    np.save('out1/qqq_encode1_tcga_w{}_{}.{}.npy'.format(ss2,aa+1,stamp1),qqq_encode1)

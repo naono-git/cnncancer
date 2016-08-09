@@ -6,15 +6,17 @@ print('setup classyfiler stage 4')
 
 nf_conv4 = 24
 nf_encode4 = 3
+key4 = ['conv','encode']
+
 if(stamp4=='NA'):
     print('initialize w4 and b4 randomly')
     weight4 = {
-        'conv':   tf.Variable(tf.truncated_normal([16,16,12,24],stddev=0.05)),
-        'encode': tf.Variable(tf.truncated_normal([16,16,24,3],stddev=0.05)),
+        'conv':   tf.Variable(tf.truncated_normal([16,16,12,24],stddev=0.1)),
+        'encode': tf.Variable(tf.truncated_normal([16,16,24,3],stddev=0.1)+1e-3),
     }
     bias4 = {
-        'conv':   tf.Variable(tf.zeros([nf_conv4])),
-        'encode': tf.Variable(tf.zeros([nf_encode4])),
+        'conv':   tf.Variable(tf.zeros([nf_conv4])+0.1),
+        'encode': tf.Variable(tf.zeros([nf_encode4])+10),
     }
 else:
     print('load w4 and b4 from',stamp4)
@@ -57,6 +59,25 @@ def get_local_entropy_encode4(qqq):
     tmp = tf.reduce_sum(rrr * (-tf.log(rrr+1e-16)),4)
     return(tmp)
 
+def verify_class(xxx,yyy):
+    nn = xxx.shape[0]
+    if(nn != len(yyy)):
+        print("xxx.shape[0]:",xxx.shape[0],"!=len(yyy):",len(yyy),"\n")
+        return(0)
+    iii_bin = np.arange(batch_size,nn,batch_size)
+    iii_nn = np.arange(nn)
+    iii_batches = np.split(iii_nn,iii_bin)
+
+    tmpx = []
+    tmpy = []
+    for iii in iii_batches:
+        tmp = tf_encode4.eval({tf_encode2:xxx[iii,],tf_yyy:yyy[iii]})
+        tmpx.append(np.argmax(tmp[:,0,0,:],axis=1))
+        tmpy.append(yyy[iii])
+    hoge = np.hstack(tmpx)
+    fuga = np.hstack(tmpy)
+    return(np.transpose(np.vstack((hoge,fuga))))
+
 #
 # save network parameters
 #
@@ -66,6 +87,3 @@ def save_stage4():
     myutil.saveObject(weight4_fin,'weight4.{}.pkl'.format(stamp))
     myutil.saveObject(bias4_fin,'bias4.{}.pkl'.format(stamp))
     return([weight4_fin,bias4_fin])
-
-
-
