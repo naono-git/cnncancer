@@ -49,12 +49,12 @@ qqq_vld = qqq_trn[iii_vld,]
 ## visualize encode
 ##
 img_org = tensorflow_util.get_image_from_qqq(qqq_vld)
-img_org.show()
 
 qqq_encode1 = tf_encode1.eval({tf_input: qqq_vld})
 qqq_deconv1 = tf_deconv1.eval({tf_input: qqq_vld})
 img_out = tensorflow_util.get_image_from_qqq(qqq_deconv1)
-img_out.show()
+img_cmp = myutil.rbind_image(img_org,img_out)
+img_cmp.show()
 
 img_enc1 = tensorflow_util.get_image_from_encode(qqq_encode1)
 
