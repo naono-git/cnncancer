@@ -22,8 +22,8 @@ import myutil
 
 exec(open('extern_params.py').read())
 
-ss = 2048 # sample size
-na = 1
+ss = 256 # sample size 2048 /
+na = 2048 // ss
 
 ## one batch one file
 # bronchioid
@@ -36,17 +36,30 @@ data_table = list(csv.reader(open('filelist.txt','r'), delimiter='\t'))
 ns = len(data_table)
 
 
-ni = 16
+# ni = ns
+ni = batch_size
 iii = random.sample(range(ns),ni)
 tmp = []
 tmpy = []
-for aa in range(ni):
-    ii = iii[aa]
+for cc in range(ni):
+    ii = iii[cc]
     path_data = data_table[ii][0]
-    img_tmp = Image.open(path_data,'r')
-    tmp.append((np.asarray(img_tmp) / 255.0)[np.newaxis,:,:,:])
-    tmpy.append(int(data_table[ii][1]))
-qqq_trn = np.vstack(tmp)
+    img_src = Image.open(path_data,'r')
+    yy = int(data_table[ii][1])
+    for bb in range(na):
+        for aa in range(na):
+            img_tmp = img_src.crop((aa*ss,bb*ss,aa*ss+ss,bb*ss+ss))
+            tmp.append((np.asarray(img_tmp) / 255.0)[np.newaxis,:,:,:])
+            tmpy.append(yy)
+
+tmp = np.vstack(tmp)
+n0 = tmp.shape[0]
+iii_vld = np.array(random.sample(range(n0),256))
+iii_trn = [ xx for ii,xx in enumerate(np.arange(n0)) if xx not in iii_vld ]
+
+qqq_trn = tmp[iii_trn,]
+qqq_vld = tmp[iii_vld,]
+
 qqq_trn1 = qqq_trn[:,::-1,:,:]
 qqq_trn2 = qqq_trn[:,:,::-1,:]
 qqq_trn4 = np.transpose(qqq_trn,[0,2,1,3])
@@ -55,39 +68,24 @@ qqq_trn5 = qqq_trn4[:,::-1,:,:]
 qqq_trn6 = qqq_trn4[:,:,::-1,:]
 qqq_trn7 = qqq_trn3[:,::-1,::-1,:]
 
-yyy_trn = tmpy
+yyy_tmp = np.array(tmpy)
+
+yyy_trn = yyy_tmp[iii_trn]
+yyy_vld = yyy_tmp[iii_vld]
+
 nn,ny,nx,nl = qqq_trn.shape
 print('nn ny nx nl',nn,ny,nx,nl)
+
 exec(open('tensorflow_ae_stage1.py').read())
 exec(open('tensorflow_ae_stage2.py').read())
 exec(open('tensorflow_ae_stage3.py').read())
-exec(open('tensorflow_classify_stage4.py').read())
+exec(open('tensorflow_classify_stage4_small.py').read())
 
-tf_input = tf.placeholder(tf.float32, [ni,ny,nx,nl])
-tf_yyy = tf.placeholder(tf.int64, [ni])
+tf_input = tf.placeholder(tf.float32, [batch_size,ny,nx,nl])
+tf_yyy = tf.placeholder(tf.int64, [batch_size])
 tf_encode1 = get_encode1(tf_input)
 tf_encode2 = get_encode2(tf_encode1)
 tf_encode3 = get_encode3(tf_encode2)
-
-# sess.run(tf.initialize_all_variables())
-
-# nj = 9
-# tmp = []
-# tmpy = []
-# for aa in range(nj):
-#     tmpx = []
-#     iii = random.sample(range(ns),ni)
-#     for aa in range(ni):
-#         ii = iii[aa]
-#         path_data = data_table[ii][0]
-#         img_tmp = Image.open(path_data,'r')#
-#         tmpx.append((np.asarray(img_tmp) / 255.0)[np.newaxis,:,:,:])
-#         tmpy.append(int(data_table[ii][1]))
-#     qqq_trn = np.vstack(tmpx)
-#     yyy_trn = tmpy
-#     hoge = tf_encode3.eval({tf_input:qqq_trn})
-#     tmp.append(hoge)
-
 tf_encode4 = get_encode4(tf_encode3)
 
 tf_loss = tf.nn.sparse_softmax_cross_entropy_with_logits(tf_encode4[:,0,0,:],tf_yyy)
@@ -98,48 +96,46 @@ tf_train = tf_optimizer.minimize(tf_loss)
 
 sess.run(tf.initialize_all_variables())
 
+iii_bin = np.arange(batch_size,nn,batch_size)
+iii_nn = np.arange(nn)
+iii_batches = np.split(iii_nn,iii_bin)
+
 for tt in range(tmax):
     if((tprint > 0) and (tt % tprint==0)):
-        print(tt,tf_mean_loss.eval({tf_input: qqq_trn, tf_yyy: yyy_trn}))
-    if((tstage > 0) and (tt % tstage==0)):
-        iii = random.sample(range(ns),ni)
-        tmp = []
-        tmpy = []
-        for aa in range(ni):
-            ii = iii[aa]
-            path_data = data_table[ii][0]
-            img_tmp = Image.open(path_data,'r')#
-            tmp.append((np.asarray(img_tmp) / 255.0)[np.newaxis,:,:,:])
-            tmpy.append(int(data_table[ii][1]))
-        qqq_trn = np.vstack(tmp)
-        yyy_trn = tmpy
-        qqq_trn1 = qqq_trn[:,::-1,:,:]
-        qqq_trn2 = qqq_trn[:,:,::-1,:]
-        qqq_trn4 = np.transpose(qqq_trn,[0,2,1,3])
-        qqq_trn3 = qqq_trn[:,::-1,::-1,:]
-        qqq_trn5 = qqq_trn4[:,::-1,:,:]
-        qqq_trn6 = qqq_trn4[:,:,::-1,:]
-        qqq_trn7 = qqq_trn3[:,::-1,::-1,:]
+        tmp = [tf_loss.eval({tf_input:qqq_trn[iii,],tf_yyy:yyy_trn[iii]}) for iii in iii_batches]
+        print(tt,np.mean(tmp))
     #
-    sess.run(tf_train,{tf_input: qqq_trn, tf_yyy: yyy_trn})
-    sess.run(tf_train,{tf_input: qqq_trn1, tf_yyy: yyy_trn})
-    sess.run(tf_train,{tf_input: qqq_trn2, tf_yyy: yyy_trn})
-    sess.run(tf_train,{tf_input: qqq_trn3, tf_yyy: yyy_trn})
-    sess.run(tf_train,{tf_input: qqq_trn4, tf_yyy: yyy_trn})
-    sess.run(tf_train,{tf_input: qqq_trn5, tf_yyy: yyy_trn})
-    sess.run(tf_train,{tf_input: qqq_trn6, tf_yyy: yyy_trn})
-    sess.run(tf_train,{tf_input: qqq_trn7, tf_yyy: yyy_trn})
+    np.random.shuffle(iii_nn)
+    iii_batches = np.split(iii_nn,iii_bin)
+    #
+    np.random.shuffle(iii_nn)
+    iii_batches = np.split(iii_nn,iii_bin)
 
+    for iii in iii_batches:
+        sess.run(tf_train,{tf_input: qqq_trn[iii,], tf_yyy: yyy_trn[iii,]})
+        sess.run(tf_train,{tf_input: qqq_trn1[iii,], tf_yyy: yyy_trn[iii,]})
+        sess.run(tf_train,{tf_input: qqq_trn2[iii,], tf_yyy: yyy_trn[iii,]})
+        sess.run(tf_train,{tf_input: qqq_trn3[iii,], tf_yyy: yyy_trn[iii,]})
+        sess.run(tf_train,{tf_input: qqq_trn4[iii,], tf_yyy: yyy_trn[iii,]})
+        sess.run(tf_train,{tf_input: qqq_trn5[iii,], tf_yyy: yyy_trn[iii,]})
+        sess.run(tf_train,{tf_input: qqq_trn6[iii,], tf_yyy: yyy_trn[iii,]})
+        sess.run(tf_train,{tf_input: qqq_trn7[iii,], tf_yyy: yyy_trn[iii,]})
+
+    
 if(tt < tmax):
-    print(tmax,tf_loss.eval({tf_input: qqq_trn, tf_yyy: yyy_trn}))
+    tmp = [tf_loss.eval({tf_input:qqq_trn[iii,],tf_yyy:yyy_trn[iii]}) ]
+    print(tmax,np.mean(tmp))
 
 #
 # show accuracy
 #
 
-hoge = tf.argmax(tf_encode4[:,0,0,:],dimension=1)
-fuga = hoge.eval({tf_input:qqq_trn})
-print(np.sum(fuga == yyy_trn),"/",len(fuga),"\n")
+hoge = verify_class(qqq_trn,yyy_trn)
+print(np.sum(hoge[:,0]==hoge[:,1]),"/",hoge.shape[0],"\n")
+
+fuga = verify_class(qqq_vld,yyy_vld)
+print(np.sum(fuga[:,0]==fuga[:,1]),"/",fuga.shape[0],"\n")
+
 
 #
 # save parameters

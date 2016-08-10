@@ -80,8 +80,8 @@ network_params = {
     'nf_encode2' : 6,
     'nf_conv3'   : 12,
     'nf_encode3' : 12,
-    'nf_conv4'   : 4,
-    'nf_class4'  : 4,
+    'nf_conv4'   : 24,
+    'nf_class4'  : 3,
     # filter size and pad size
     'fs_1' : 7,
     'ps_1' : 3,
@@ -89,7 +89,7 @@ network_params = {
     'ps_2' : 2,
     'fs_3' : 3,
     'ps_3' : 1,
-    'fs_4' : 8,
+    'fs_4' : 16,
     'pool_size' : 2,
     # learning parameters
     'lambda_s'      : 1e-5,
