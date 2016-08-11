@@ -4,7 +4,7 @@
 
 import myutil
 
-extern_params = {'random_seed'  : 765,
+extern_params = {'random_seed'  : 'NA',
                  'stamp1'       : 'NA',
                  'stamp2'       : 'NA',
                  'stamp3'       : 'NA',
@@ -38,6 +38,13 @@ for k,v in extern_params.items():
 stamp = myutil.timestamp()
 print('stamp = ',stamp)
 
+#
+# random seed
+#
+if(random_seed=='NA'):
+    random.seed()
+else:
+    random.seed(random_seed)
 #
 # data paths
 #
