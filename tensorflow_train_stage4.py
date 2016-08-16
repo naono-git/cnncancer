@@ -22,7 +22,7 @@ import myutil
 
 exec(open('extern_params.py').read())
 
-ss = 256 # sample size 2048 /
+ss = 128 # sample size 2048 /
 na = 2048 // ss
 
 ## one batch one file
