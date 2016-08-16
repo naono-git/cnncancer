@@ -11,6 +11,7 @@ import csv
 import numpy as np
 import pickle
 from PIL import Image
+import random
 
 import tensorflow as tf
 import tensorflow_ae_base
@@ -24,13 +25,12 @@ exec(open('extern_params.py').read())
 
 ss = 256 # sample size 2048 /
 na = 2048 // ss
-
+print('ss',ss)
 ## one batch one file
 # bronchioid
 # magnoid
 # squamoid	
 
-import random
 
 data_table = list(csv.reader(open('filelist.txt','r'), delimiter='\t'))
 ns = len(data_table)
@@ -38,6 +38,7 @@ ns = len(data_table)
 
 # ni = ns
 ni = batch_size
+## ni = 64
 iii = random.sample(range(ns),ni)
 tmp = []
 tmpy = []
@@ -123,7 +124,7 @@ for tt in range(tmax):
 
     
 if(tt < tmax):
-    tmp = [tf_loss.eval({tf_input:qqq_trn[iii,],tf_yyy:yyy_trn[iii]}) ]
+    tmp = [tf_loss.eval({tf_input:qqq_trn[iii,],tf_yyy:yyy_trn[iii]}) for iii in iii_batches]
     print(tmax,np.mean(tmp))
 
 #

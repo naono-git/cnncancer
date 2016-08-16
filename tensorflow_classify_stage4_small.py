@@ -73,7 +73,7 @@ def verify_class(xxx,yyy):
     tmpx = []
     tmpy = []
     for iii in iii_batches:
-        tmp = tf_encode4.eval({tf_encode2:xxx[iii,],tf_yyy:yyy[iii]})
+        tmp = tf_encode4.eval({tf_input:xxx[iii,],tf_yyy:yyy[iii]})
         tmpx.append(np.argmax(tmp[:,0,0,:],axis=1))
         tmpy.append(yyy[iii])
     hoge = np.hstack(tmpx)
