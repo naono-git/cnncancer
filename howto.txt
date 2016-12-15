@@ -1,0 +1,18 @@
+# first, setup data sample from TIFF images using,
+make_tcga_sample.py
+# that create numpy data files from images.
+
+## to prepare CNN networks, we need
+#import tensorflow_ae_base.py
+#import tensorflow_util.py
+#import myutil.py
+
+#exec(open('extern_params.py').read())
+#exec(open('tensorflow_ae_stage1.py').read())
+# NOTE They are included in tensorflow_train_stage1.py,
+
+# Then using these data we can train autoencoder
+tensorflow_train_stage1.py
+
+# after training you can verify the networks
+tensorflow_verify_stage1.py
