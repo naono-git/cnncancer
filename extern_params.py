@@ -42,9 +42,12 @@ print('stamp = ',stamp)
 # random seed
 #
 if(random_seed=='NA'):
-    random.seed()
+    rs = int(stamp)
+    random.seed(rs)
+    print('rs = ',rs)
 else:
     random.seed(random_seed)
+    print('random_seed = ',random_seed)
 #
 # data paths
 #

@@ -7,15 +7,24 @@ random_seed = 765
 np.random.seed(random_seed)
 print('random_seed',random_seed)
 
-nx = ny = 32   # image size
 nl = 3
+nx = ny = 32   # image size
 nn = 10000     # number of slices for each image
 
 ### NOTE chage these paths according to your environment
-dir_img = '/Users/nono/Documents/data/KPC'
+if(os.path.exists('/Users/nono/Documents/data/KPC')):
+    dir_img = '/Users/nono/Documents/data/KPC'
+if(os.path.exists('/project/hikaku_db/data/KPC')):
+    dir_img = '/project/hikaku_db/data/KPC'
+
 list_img_file = ('KPC F838-2/HE/KPC-F838-2_2015_08_26_0002.tif',
-                 'KPC F838-3/HE/KPC-F838-3_2016_07_12_014.tif') # add more
-dir_data = '/Users/nono/Documents/cnncancer/dat1'
+                 'KPC F838-3/HE/KPC-F838-3_2016_07_12_014.tif',
+                 'KPC K-135/K135 Panc HE_s1.tif',
+                 'KPC K-138/K138 Panc HE_s1.tif',
+                 'KPC K-97/K97 Panc HE_s1.tif',
+                 'KPC K-99/K99 Panc HE_s1.tif',
+                 'KPCL103/KPCL103 Panc HE.tif') # add more
+dir_data = 'dat1'
 ###
 
 data_list = []
