@@ -25,19 +25,12 @@ exec(open('tensorflow_ae_stage1.py').read())
 exec(open('tensorflow_ae_stage2.py').read())
 
 # extern 
-ss = 2048
+ss = 128
 
-data_table = list(csv.reader(open('filelist.txt','r'), delimiter='\t'))
-ns = len(data_table)
-ni = 16
-na = ns // ni
-for ii in range(ni) :
-    path_data = data_table[ii][0]
-    img_tmp = Image.open(path_data,'r')
-    tmp.append((np.asarray(img_tmp) / 255.0)[np.newaxis,:,:,:])
-    tmpy.append(int(data_table[ii][1]))
-qqq_trn = np.vstack(tmp)
-nn,ny,nx,nl = qqq_trn.shape
+path_data =os.path.join(dir_data,'tcga_trn_w128.npy')
+print(path_data)
+qqq_tmp = np.load(path_data)
+nn,ny,nx,nl = qqq_tmp.shape
 
 exec(open('tensorflow_ae_stage1.py').read())
 exec(open('tensorflow_ae_stage2.py').read())
@@ -47,14 +40,5 @@ tf_encode1 = get_encode1(tf_input)
 tf_encode2 = get_encode2(tf_encode1)
 sess.run(tf.initialize_all_variables())
 
-for aa in range(na) :
-    iii = np.arange(ni)+aa*ni
-    for ii in iii :
-        path_data = data_table[ii][0]
-        img_tmp = Image.open(path_data,'r')
-        tmp.append((np.asarray(img_tmp) / 255.0)[np.newaxis,:,:,:])
-        tmpy.append(int(data_table[ii][1]))
-    qqq_trn = np.vstack(tmp)
-    qqq_encode2 = tf_encode2.eval({tf_input: qqq_trn})
-    ww_enc = qqq_encode2.shape[2]
-    np.save('out1/qqq_encode2_tcga_w{}_{}.{}.npy'.format(ww_enc,stamp2,aa+1),qqq_encode2)
+qqq_encode2 = tf_encode2.eval({tf_input: qqq_tmp})
+np.save('dat1/tcga_encode2_w32.{}.npy'.format(stamp2),qqq_encode2)

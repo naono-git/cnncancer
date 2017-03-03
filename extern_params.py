@@ -42,9 +42,9 @@ print('stamp = ',stamp)
 # random seed
 #
 if(random_seed=='NA'):
-    random.seed()
+    np.random.seed()
 else:
-    random.seed(random_seed)
+    np.random.seed(random_seed)
 #
 # data paths
 #
@@ -70,6 +70,7 @@ if(os.path.exists(dir_home)):
 if(os.path.exists(dir_Users)):
     dir_input = dir_Users
 
+dir_data = 'dat1'
 if(not 'dir_out' in locals()):
     dir_out = 'out1'
 #

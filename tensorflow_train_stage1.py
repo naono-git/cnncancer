@@ -28,8 +28,7 @@ exec(open('extern_params.py').read())
 
 ss = 32 # sample size
 if(not 'qqq_trn' in locals()):
-    file_input = 'qqq_trn_w{}.npy'.format(ss)
-    path_data = os.path.join(dir_input,'input_w{}'.format(ss),file_input)
+    path_data = os.path.join(dir_data,'tcga_trn_w32.npy')
     qqq_trn = np.load(path_data)
     print('load input from {}'.format(path_data))
 
