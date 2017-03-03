@@ -43,10 +43,10 @@ print('stamp = ',stamp)
 #
 if(random_seed=='NA'):
     rs = int(stamp)
-    random.seed(rs)
+    np.random.seed(rs)
     print('rs = ',rs)
 else:
-    random.seed(random_seed)
+    np.random.seed(random_seed)
     print('random_seed = ',random_seed)
 #
 # data paths
