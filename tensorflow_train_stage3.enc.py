@@ -26,16 +26,11 @@ exec(open('extern_params.py').read())
 #
 
 ss = 32 # sample size # w64 encoded to 32
-na = 16
 
-if((not 'qqq_encode2' in locals()) or (not qqq_encode2.shape[2]==ss)):
-    tmp = []
-    for aa in range(na):
-        file_input = 'qqq_encode2e_tcag_w{}_{}.{}.npy'.format(ss,aa+1,stamp2)
-        path_data = os.path.join(dir_out,file_input)
-        tmp.append(np.load(path_data))
-        print('load input from {}'.format(path_data))
-    qqq_encode2 = np.vstack(tmp)
+file_input = 'tcga_encode2_w{}.{}.npy'.format(ss,stamp2)
+path_data = os.path.join(dir_data,file_input)
+print('load input from {}'.format(path_data))
+qqq_encode2 = np.load(path_data)
 
 nn,ny,nx,nl = qqq_encode2.shape
 print('nn ny nx nl',nn,ny,nx,nl)
@@ -55,14 +50,14 @@ mean_entropy = tf.reduce_mean(local_entropy)
 optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
 train = optimizer.minimize(mean_error + lambda_s*mean_entropy)
 
+sess.run(tf.initialize_all_variables())
+
 #
 # train loop
 #
 iii_bin = np.arange(batch_size,nn,batch_size)
 iii_nn = np.arange(nn)
 iii_batches = np.split(iii_nn,iii_bin)
-
-sess.run(tf.initialize_all_variables())
 
 # extern
 # tmax,tprint = 10,1

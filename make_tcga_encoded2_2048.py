@@ -18,7 +18,6 @@ from tensorflow_ae_base import *
 import tensorflow_util
 import myutil
 
-import random
 exec(open('extern_params.py').read())
 
 # extern stamp1 stamp2
@@ -27,42 +26,50 @@ exec(open('tensorflow_ae_stage2.py').read())
 
 # extern 
 ss = 2048
+ns = 128
 
-data_table = list(csv.reader(open('filelist.txt','r'), delimiter='\t'))
-ns = len(data_table)
-ni = 16
-na = ns // ni
-tmp = []
-for ii in range(ni) :
-    path_data = data_table[ii][0]
-    img_tmp = Image.open(path_data,'r')
-    tmp.append((np.asarray(img_tmp) / 255.0)[np.newaxis,:,:,:])
-qqq_trn = np.vstack(tmp)
-nn,ny,nx,nl = qqq_trn.shape
+dir_image = dir_tcga_project
+dir_data = 'dat1'
 
+nx = ss
+ny = ss
+nl = 3
+
+# stamp1,stamp2
 exec(open('tensorflow_ae_stage1.py').read())
 exec(open('tensorflow_ae_stage2.py').read())
 
-tf_input = tf.placeholder(tf.float32, [ni,ny,nx,nl])
+tf_input = tf.placeholder(tf.float32, [None,ny,nx,nl])
 tf_encode1 = get_encode1(tf_input)
 tf_encode2 = get_encode2(tf_encode1)
 sess.run(tf.initialize_all_variables())
 
-iii_rand = np.array(random.sample(range(ns),ns))
-for aa in range(na) :
-    print(aa,)
-    iii = iii_rand[np.arange(16)+aa*ni]
-    tmpx = []
-    tmpy = []
-    for ii in iii :
-        tmp = []
-        path_data = data_table[ii][0]
-        img_tmp = Image.open(path_data,'r')
-        tmpx.append((np.asarray(img_tmp) / 256.0)[np.newaxis,:,:,:])
-        tmpy.append([ii,int(data_table[ii][1])])
-    qqq_trn = np.vstack(tmpx)
-    yyy_trn = np.vstack(tmpy)
-    qqq_encode2 = tf_encode2.eval({tf_input: qqq_trn})
-    ww_enc = qqq_encode2.shape[2]
-    np.save('out1/qqq_encode2_tcga_w{}_{}.{}.npy'.format(ww_enc,stamp2,aa+1),qqq_encode2)
-    np.save('out1/yyy_encode2_tcga_w{}_{}.{}.npy'.format(ww_enc,stamp2,aa+1),yyy_trn)
+file_imglist = 'typelist.filterd.txt'
+fileTable = list(csv.reader(open("typelist.filterd.txt",'r'), delimiter='\t'))
+
+iii_sample = np.random.choice(range(len(fileTable)),size=ns,replace=False)
+
+index = []
+tmpx = []
+yyy_trn = []
+for aa in range(ns):
+    ii = iii_sample[aa]
+    file_src = fileTable[ii][0]
+    path_data = os.path.join(dir_image,file_src)
+    ## print(path_data)
+    img_src = Image.open(path_data,'r')
+    mx = img_src.size[0]
+    my = img_src.size[1]
+    img_tmp = Image.open(path_data,'r')
+    qqq_tmp = (np.asarray(img_tmp) / 255.0)[np.newaxis,:,:,:]
+    qqq_encode2 = tf_encode2.eval({tf_input: qqq_tmp})
+    index.append(ii)
+    tmpx.append(qqq_encode2)
+    tmpy.append(fileTable[ii][1])
+
+index = np.asarray(index)
+qqq_trn = np.vstack(tmpx)
+yyy_trn = np.asarray(tmpy)
+np.save('dat1/tcga_encode2_w512.{}.npy'.format(stamp2),qqq_trn)
+np.save('dat1/type_encode2_w512.{}.npy'.format(stamp2),yyy_trn)
+np.save('dat1/index_encode2_w512.{}.npy'.format(stamp2),index)

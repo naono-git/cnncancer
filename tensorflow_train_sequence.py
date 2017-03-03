@@ -32,24 +32,23 @@ tprint = 1
 ss = 32
 # exec(open('make_tcga_sample.py').read())
 # del(qqq_trn)
-exec(open('tensorflow_train_stage1.py').read())
-stamp1 = stamp
-trainable1 = False
+if(stamp1=='NA'):
+    exec(open('tensorflow_train_stage1.py').read())
+    stamp1 = stamp
+    trainable1 = False
+    exec(open('make_tcga_encoded1.py').read())
 
-exec(open('make_tcga_encoded1.py').read())
+if(stamp2=='NA'):
+    exec(open('tensorflow_train_stage2.enc.py').read())
+    stamp2 = stamp
+    trainable2 = False
+    exec(open('make_tcga_encoded2.py').read())
 
-exec(open('tensorflow_train_stage2.enc.py').read())
-stamp2 = stamp
-trainable2 = False
-
-exec(open('make_tcga_encoded2.py').read())
-
-exec(open('tensorflow_train_stage3.enc.py').read())
-stamp3 = stamp
-trainable3 = False
+if(stamp3=='NA'):
+    exec(open('tensorflow_train_stage3.enc.py').read())
+    stamp3 = stamp
+    trainable3 = True
 
 exec(open('make_tcga_encoded2_2048.py').read())
-del(qqq_trn)
-
 exec(open('tensorflow_train_stage4_encoded2.py').read())
 stamp4 = stamp

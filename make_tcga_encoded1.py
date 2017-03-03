@@ -33,14 +33,15 @@ print(path_data)
 qqq_tmp = np.load(path_data)
 nn,ny,nx,nl = qqq_tmp.shape
 
-iii_bin = np.arange(batch_size,nn,batch_size)
-iii_nn = np.arange(nn)
-iii_batches = np.split(iii_nn,iii_bin)
-
 tf_input = tf.placeholder(tf.float32, [None,ny,nx,nl])
 tf_encode1 = get_encode1(tf_input)
 sess.run(tf.initialize_all_variables())
 
-qqq_encode1 = tf_encode1.eval({tf_input: qqq_tmp})
+iii_bin = np.arange(batch_size,nn,batch_size)
+iii_nn = np.arange(nn)
+iii_batches = np.split(iii_nn,iii_bin)
+
+tmp = [tf_encode1.eval({tf_input: qqq_tmp[iii,]}) for iii in iii_batches]
+qqq_encode1 = np.vstack(tmp)
 
 np.save('dat1/tcga_encode1_w32.{}.npy'.format(stamp1),qqq_encode1)

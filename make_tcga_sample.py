@@ -19,7 +19,7 @@ nx = ny = 64   # image size
 nn = 100       # number of slices from a image
 
 nx = ny = 128  # image size 
-nn = 25        # number of slices from a image
+nn = 100        # number of slices from a image
 
 nl = 3         # RGB
 
@@ -53,6 +53,7 @@ if(not os.path.exists(dir_input)):
     os.makedirs(dir_input)
 
 print(dir_input)
+dir_image = dir_tcga_project
 dir_data = 'dat1'
 
 print(dir_data)
@@ -66,7 +67,6 @@ iii_sample = np.random.choice(range(len(fileTable)),size=ns,replace=False)
 qqq_src = []
 for aa in range(ns):
     ii = iii_sample[aa]
-    print(ii)
     
     file_src = fileTable[ii][0]
     print(file_src)

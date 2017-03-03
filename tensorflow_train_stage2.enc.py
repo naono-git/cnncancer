@@ -18,7 +18,6 @@ from tensorflow_ae_base import *
 import tensorflow_util
 import myutil
 
-# extern stamp1c
 exec(open('extern_params.py').read())
 
 #
@@ -26,22 +25,11 @@ exec(open('extern_params.py').read())
 #
 
 ss = 32 # sample size
-na = 4
 
-hoge = ('qqq_encode1' in locals())
-if(hoge):
-    fuga = (not qqq_encode1.shape[2] == ss)
-else:
-    fuga = False
-
-if(fuga):
-    tmp = []
-    for aa in range(na):
-        file_input = 'qqq_encode1_tcga_w{}_{}.{}.npy'.format(ss,aa+1,stamp1)
-        path_data = os.path.join(dir_out,file_input)
-        tmp.append(np.load(path_data))
-        print('load input from {}'.format(path_data))
-    qqq_encode1 = np.vstack(tmp)
+file_input = 'tcga_encode1_w{}.{}.npy'.format(ss,stamp1)
+path_data = os.path.join(dir_data,file_input)
+print('load input from {}'.format(path_data))
+qqq_encode1 = np.load(path_data)
 
 nn,ny,nx,nl = qqq_encode1.shape
 print('nn ny nx nl',nn,ny,nx,nl)
@@ -60,6 +48,9 @@ local_entropy = get_local_entropy_encode2(tf_encode2)
 mean_entropy = tf.reduce_mean(local_entropy)
 optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
 train = optimizer.minimize(mean_error + lambda_s*mean_entropy)
+## train = optimizer.minimize(mean_error)
+
+sess.run(tf.initialize_all_variables())
 
 #
 # train loop
@@ -67,8 +58,6 @@ train = optimizer.minimize(mean_error + lambda_s*mean_entropy)
 iii_bin = np.arange(batch_size,nn,batch_size)
 iii_nn = np.arange(nn)
 iii_batches = np.split(iii_nn,iii_bin)
-
-sess.run(tf.initialize_all_variables())
 
 # extern
 # tmax,tprint = 10,1
@@ -92,12 +81,7 @@ if(tt < tmax):
 #
 # save parameters
 #
-weight2_fin = {k:sess.run(v) for k,v in weight2.items()}
-bias2_fin = {k:sess.run(v) for k,v, in bias2.items()}
-myutil.saveObject(weight2_fin,'weight2.{}.pkl'.format(stamp))
-myutil.saveObject(bias2_fin,'bias2.{}.pkl'.format(stamp))
+save_stage2()
 
-# exec(open('tensorflow_verify_stage2.py').read())
-# exec(open('tensorflow_encode_stage2.py').read())
 myutil.timestamp()
 print('stamp2 = \'{}\''.format(stamp))

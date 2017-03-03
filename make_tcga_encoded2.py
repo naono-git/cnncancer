@@ -35,10 +35,16 @@ nn,ny,nx,nl = qqq_tmp.shape
 exec(open('tensorflow_ae_stage1.py').read())
 exec(open('tensorflow_ae_stage2.py').read())
 
-tf_input = tf.placeholder(tf.float32, [ni,ny,nx,nl])
+tf_input = tf.placeholder(tf.float32, [None,ny,nx,nl])
 tf_encode1 = get_encode1(tf_input)
 tf_encode2 = get_encode2(tf_encode1)
 sess.run(tf.initialize_all_variables())
 
-qqq_encode2 = tf_encode2.eval({tf_input: qqq_tmp})
+iii_bin = np.arange(batch_size,nn,batch_size)
+iii_nn = np.arange(nn)
+iii_batches = np.split(iii_nn,iii_bin)
+
+tmp = [tf_encode2.eval({tf_input: qqq_tmp[iii,]}) for iii in iii_batches]
+qqq_encode2 = np.vstack(tmp)
+
 np.save('dat1/tcga_encode2_w32.{}.npy'.format(stamp2),qqq_encode2)
