@@ -23,7 +23,7 @@ import myutil
 
 exec(open('extern_params.py').read())
 
-ss = 128 # sample size 2048 /
+ss = 512 # sample size 2048 /
 na = 2048 // ss
 print('ss',ss)
 ## one batch one file
@@ -37,9 +37,11 @@ ns = len(data_table)
 
 
 # ni = ns
-ni = batch_size
-## ni = 64
+# ni = batch_size
+ni = 48
 iii = random.sample(range(ns),ni)
+## iii = np.array([0,3,6,9,144,147,150,153,300,303,306,309])
+## ni = 12
 tmp = []
 tmpy = []
 for cc in range(ni):
@@ -133,10 +135,11 @@ if(tt < tmax):
 
 hoge = verify_class(qqq_trn,yyy_trn)
 print(np.sum(hoge[:,0]==hoge[:,1]),"/",hoge.shape[0],"\n")
+np.savetxt("out1/verify_128_{}.txt".format(stamp),hoge,fmt="%d")
 
 fuga = verify_class(qqq_vld,yyy_vld)
 print(np.sum(fuga[:,0]==fuga[:,1]),"/",fuga.shape[0],"\n")
-
+np.savetxt("out1/verify_cross_128_{}.txt".format(stamp),fuga,fmt="%d")
 
 #
 # save parameters

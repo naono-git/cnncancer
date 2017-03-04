@@ -26,9 +26,9 @@ exec(open('tensorflow_ae_stage2.py').read())
 
 # extern 
 ss = 2048
-ns = 128
+ns = 256
 
-dir_image = dir_tcga_project
+dir_image = '/project/hikaku_db/data/tissue_images'
 dir_data = 'dat1'
 
 nx = ss
@@ -45,12 +45,12 @@ tf_encode2 = get_encode2(tf_encode1)
 sess.run(tf.initialize_all_variables())
 
 file_imglist = 'typelist.filterd.txt'
-fileTable = list(csv.reader(open("typelist.filterd.txt",'r'), delimiter='\t'))
+fileTable = list(csv.reader(open("dat1/typelist.filterd.txt",'r'), delimiter='\t'))
 
 iii_sample = np.random.choice(range(len(fileTable)),size=ns,replace=False)
 
 index = []
-tmpx = []
+qqq_trn = []
 yyy_trn = []
 for aa in range(ns):
     ii = iii_sample[aa]
@@ -64,12 +64,12 @@ for aa in range(ns):
     qqq_tmp = (np.asarray(img_tmp) / 255.0)[np.newaxis,:,:,:]
     qqq_encode2 = tf_encode2.eval({tf_input: qqq_tmp})
     index.append(ii)
-    tmpx.append(qqq_encode2)
-    tmpy.append(fileTable[ii][1])
+    qqq_trn.append(qqq_encode2)
+    yyy_trn.append(fileTable[ii][1])
 
 index = np.asarray(index)
-qqq_trn = np.vstack(tmpx)
-yyy_trn = np.asarray(tmpy)
+qqq_trn = np.vstack(qqq_trn)
+yyy_trn = np.asarray(yyy_trn)
 np.save('dat1/tcga_encode2_w512.{}.npy'.format(stamp2),qqq_trn)
 np.save('dat1/type_encode2_w512.{}.npy'.format(stamp2),yyy_trn)
 np.save('dat1/index_encode2_w512.{}.npy'.format(stamp2),index)

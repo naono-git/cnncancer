@@ -13,18 +13,18 @@ print('random_seed',random_seed)
 ns = 300       # number of sample files 
 
 nx = ny = 32   # image size 
-nn = 100       # number of slices from a image
+nb = 100       # number of slices from a image
 
 nx = ny = 64   # image size 
-nn = 100       # number of slices from a image
+nb = 100       # number of slices from a image
 
 nx = ny = 128  # image size 
-nn = 100        # number of slices from a image
+nb = 100       # number of slices from a image
 
 nl = 3         # RGB
 
 print("image size",nx,ny)
-print("number of train images",nn*ns)
+print("number of train images",nb*ns)
 
 dir_tcga = None
 dir_tcga_project   = '/project/hikaku_db/data/tissue_images'
@@ -59,8 +59,7 @@ dir_data = 'dat1'
 print(dir_data)
 
 file_imglist = 'typelist.filterd.txt'
-fileTable = list(csv.reader(open("typelist.filterd.txt",'r'), delimiter='\t'))
-
+fileTable = list(csv.reader(open("dat1/typelist.filterd.txt",'r'), delimiter='\t'))
 
 iii_sample = np.random.choice(range(len(fileTable)),size=ns,replace=False)
 
@@ -74,9 +73,9 @@ for aa in range(ns):
     mx = img_src.size[0]
     my = img_src.size[1]
 
-    qqq_ss = np.empty((nn, nx, ny, nl), np.float32)
+    qqq_ss = np.empty((nb, nx, ny, nl), np.float32)
     bb = 0
-    while(bb < nn):
+    while(bb < nb):
         x0 = np.random.choice(range(mx-nx),size=1)[0]
         y0 = np.random.choice(range(my-ny),size=1)[0]
 

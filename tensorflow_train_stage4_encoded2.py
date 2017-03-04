@@ -22,8 +22,9 @@ import myutil
 
 exec(open('extern_params.py').read())
 
-ss = 2048 # sample size
-
+## ss = 2048 # sample size
+ss = 1024
+wx = 256
 ## one batch one file
 # bronchioid
 # magnoid
@@ -33,7 +34,7 @@ tmpx = []
 tmpy = []
 
 dir_data = 'dat1'
-file_data = 'tcga_encode2_w512.{}.npy'.format(stamp2)
+file_data = 'tcga_encode2_w{}.{}.npy'.format(wx,stamp2)
 path_data = os.path.join(dir_data,file_data)
 print(path_data)
 
@@ -50,7 +51,7 @@ qqq_trn7 = qqq_trn3[:,::-1,::-1,:]
 nn,ny,nx,nl = qqq_trn.shape
 print('nn ny nx nl',nn,ny,nx,nl)
 
-file_data = 'type_encode2_w512.{}.npy'.format(stamp2)
+file_data = 'type_encode2_w{}.{}.npy'.format(wx,stamp2)
 path_data = os.path.join(dir_data,file_data)
 type_trn = np.load(path_data)
 yyy_trn = np.zeros(nn)
@@ -72,34 +73,54 @@ tf_yyy = tf.placeholder(tf.int64, [None])
 tf_encode3 = get_encode3(tf_encode2)
 tf_encode4 = get_encode4(tf_encode3)
 
-tf_loss = tf.nn.sparse_softmax_cross_entropy_with_logits(tf_encode4[:,0,0,:],tf_yyy)
+tf_loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=tf_encode4[:,0,0,:],labels=tf_yyy)
 tf_mean_loss  = tf.reduce_mean(tf_loss)
 tf_optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
 tf_train = tf_optimizer.minimize(tf_loss)
 
 sess.run(tf.initialize_all_variables())
 
+batch_size = 16
+nn = nn //batch_size*batch_size
+iii_bin = np.arange(batch_size,nn,batch_size)
+iii_nn = np.arange(nn)
+iii_batches = np.split(iii_nn,iii_bin)
+
 for tt in range(tmax):
     if((tprint > 0) and (tt % tprint==0)):
-        tmp = tf_loss.eval({tf_encode2:qqq_trn,tf_yyy:yyy_trn})
+        tmp = [tf_loss.eval({tf_encode2:qqq_trn[iii],tf_yyy:yyy_trn[iii]}) for iii in iii_batches]
         print(tt,np.mean(tmp))
     #
     np.random.shuffle(iii_nn)
     iii_batches = np.split(iii_nn,iii_bin)
     #
     for iii in iii_batches:
-        sess.run(tf_train,{tf_encode2: qqq_trn,  tf_yyy: yyy_trn})
-        sess.run(tf_train,{tf_encode2: qqq_trn1, tf_yyy: yyy_trn})
-        sess.run(tf_train,{tf_encode2: qqq_trn2, tf_yyy: yyy_trn})
-        sess.run(tf_train,{tf_encode2: qqq_trn3, tf_yyy: yyy_trn})
-        sess.run(tf_train,{tf_encode2: qqq_trn4, tf_yyy: yyy_trn})
-        sess.run(tf_train,{tf_encode2: qqq_trn5, tf_yyy: yyy_trn})
-        sess.run(tf_train,{tf_encode2: qqq_trn6, tf_yyy: yyy_trn})
-        sess.run(tf_train,{tf_encode2: qqq_trn7, tf_yyy: yyy_trn})
+        sess.run(tf_train,{tf_encode2: qqq_trn[iii],  tf_yyy: yyy_trn[iii]})
+        sess.run(tf_train,{tf_encode2: qqq_trn1[iii], tf_yyy: yyy_trn[iii]})
+        sess.run(tf_train,{tf_encode2: qqq_trn2[iii], tf_yyy: yyy_trn[iii]})
+        sess.run(tf_train,{tf_encode2: qqq_trn3[iii], tf_yyy: yyy_trn[iii]})
+        sess.run(tf_train,{tf_encode2: qqq_trn4[iii], tf_yyy: yyy_trn[iii]})
+        sess.run(tf_train,{tf_encode2: qqq_trn5[iii], tf_yyy: yyy_trn[iii]})
+        sess.run(tf_train,{tf_encode2: qqq_trn6[iii], tf_yyy: yyy_trn[iii]})
+        sess.run(tf_train,{tf_encode2: qqq_trn7[iii], tf_yyy: yyy_trn[iii]})
 
 if(tt < tmax):
-    tmp = tf_loss.eval({tf_encode2:qqq_trn,tf_yyy:yyy_trn})
+    tmp = [tf_loss.eval({tf_encode2:qqq_trn[iii],tf_yyy:yyy_trn[iii]}) for iii in iii_batches]
     print(tmax,np.mean(tmp))
+
+iii_nn = np.arange(nn)
+iii_batches = np.split(iii_nn,iii_bin)
+hoge = [tf_encode4.eval({tf_encode2:qqq_trn[iii]}) for iii in iii_batches]
+fuga = np.reshape(np.asarray(hoge),(nn,3))
+predict = np.zeros(nn)
+precision = np.zeros(nn)
+confusion = np.zeros((3,3))
+for aa in range(nn):
+    predict[aa] = np.argmax(fuga[aa,])
+    precision[aa] = predict[aa]==yyy_trn[aa]
+for aa in range(3):
+    for bb in range(3):
+        confusion[aa][bb] = np.sum(np.logical_and(yyy_trn == aa, predict==bb))
 
 # hoge = verify_class(qqq_trn,yyy_trn)
 # print(np.sum(hoge[:,0]==hoge[:,1]),"/",hoge.shape[0],"\n")

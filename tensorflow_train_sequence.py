@@ -26,8 +26,8 @@ trainable1 = True
 trainable2 = True
 trainable3 = True
 trainable4 = True
-tmax = 10
-tprint = 1
+tmax = 30
+tprint = 3
 
 ss = 32
 # exec(open('make_tcga_sample.py').read())
@@ -49,6 +49,8 @@ if(stamp3=='NA'):
     stamp3 = stamp
     trainable3 = True
 
-exec(open('make_tcga_encoded2_2048.py').read())
+# exec(open('make_tcga_encoded2_2048.py').read())
+ss = 1024
+exec(open('make_tcga_encoded2_1024.py').read())
 exec(open('tensorflow_train_stage4_encoded2.py').read())
 stamp4 = stamp
