@@ -35,16 +35,16 @@ for k,v in extern_params.items():
 #       
 # current time stamp
 #
-stamp = myutil.timestamp()
+stamp = myutil.show_timestamp()
 print('stamp = ',stamp)
 
 #
 # random seed
 #
 if(random_seed=='NA'):
-    random.seed()
+    np.random.seed()
 else:
-    random.seed(random_seed)
+    np.random.seed(random_seed)
 #
 # data paths
 #
@@ -115,8 +115,7 @@ for k,v in network_params.items():
 #
 
 key1 = ['conv1', 'encode1', 'hidden1', 'deconv1']
-key2 = ['conv2', 'encode2', 'hidden2', 'deconv2']
-key3 = ['conv3', 'encode3', 'hidden3', 'deconv3']
+key2 = ['encode', 'decode']
 
 #
 # setup tensorflow session

@@ -19,8 +19,8 @@ print('random_seed',random_seed)
 # nx=ny=sx=sy=32
 # na,nn=1,6400
 
-# nx=ny=sx=sy=64
-# na,nn=4,1600
+nx=ny=sx=sy=64
+na,nn=4,1600
 
 # nx=ny=sx=sy=128
 # na,nn=16,400

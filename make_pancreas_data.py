@@ -13,8 +13,8 @@ nn = 10000     # number of slices for each image
 
 ### NOTE chage these paths according to your environment
 dir_img = '/Users/nono/Documents/data/KPC'
-list_img_file = ('KPC F838-2/HE/KPC-F838-2_2015_08_26_0002.tif',
-                 'KPC F838-3/HE/KPC-F838-3_2016_07_12_014.tif') # add more
+## list_img_file = ('KPC F838-2/HE/KPC-F838-2_2015_08_26_0002.tif',
+##                 'KPC F838-3/HE/KPC-F838-3_2016_07_12_014.tif') # add more
 dir_data = '/Users/nono/Documents/cnncancer/dat1'
 ###
 

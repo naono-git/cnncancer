@@ -8,8 +8,10 @@ import datetime
 ##def exists(varname):
 ##    print(len(globals()))
 ##    return(varname in locals())
-
-def timestamp():
+def source(filename):
+    exec(open(filename).read())
+    
+def show_timestamp():
     time_cur = datetime.datetime.now()
     print('datetime:',time_cur.strftime('%m/%d %H:%M'))
     stamp = time_cur.strftime('%Y%m%d%H%M')
