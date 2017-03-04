@@ -42,8 +42,8 @@ print('stamp = ',stamp)
 # random seed
 #
 if(random_seed=='NA'):
-    rs = int(stamp)
-    print('random_seed is NA, tmp rs = ',rs)
+    rs = int(stamp) % 4294967295
+    print('random_seed = NA, use tmp seed = ',rs)
     np.random.seed(rs)
 else:
     print('random_seed = ',random_seed)
@@ -75,7 +75,7 @@ if(os.path.exists(dir_Users)):
     dir_input = dir_Users
 
 if(not 'dir_out' in locals()):
-    dir_out = 'out1'
+    dir_out = 'pan1'
 #
 
 #
@@ -119,7 +119,8 @@ for k,v in network_params.items():
 #
 
 key1 = ['conv1', 'encode1', 'hidden1', 'deconv1']
-key2 = ['encode', 'decode']
+key2 = ['conv2', 'encode2', 'hidden2', 'deconv2']
+key3 = ['encode', 'decode']
 
 #
 # setup tensorflow session
