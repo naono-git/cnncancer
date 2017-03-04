@@ -108,19 +108,20 @@ if(tt < tmax):
     tmp = [tf_loss.eval({tf_encode2:qqq_trn[iii],tf_yyy:yyy_trn[iii]}) for iii in iii_batches]
     print(tmax,np.mean(tmp))
 
-iii_nn = np.arange(nn)
+iii_nn = np.random.choice(range(qqq_trn.shape[0]),size=256,replace=False)
+iii_bin = np.arange(16,256,16)
 iii_batches = np.split(iii_nn,iii_bin)
 hoge = [tf_encode4.eval({tf_encode2:qqq_trn[iii]}) for iii in iii_batches]
-fuga = np.reshape(np.asarray(hoge),(nn,3))
-predict = np.zeros(nn)
-precision = np.zeros(nn)
+fuga = np.reshape(np.asarray(hoge),(256,3))
+predict = np.zeros(256)
+precision = np.zeros(256)
 confusion = np.zeros((3,3))
-for aa in range(nn):
+for aa in range(256):
     predict[aa] = np.argmax(fuga[aa,])
-    precision[aa] = predict[aa]==yyy_trn[aa]
+    precision[aa] = predict[aa]==yyy_trn[iii_nn[aa]]
 for aa in range(3):
     for bb in range(3):
-        confusion[aa][bb] = np.sum(np.logical_and(yyy_trn == aa, predict==bb))
+        confusion[aa][bb] = np.sum(np.logical_and(yyy_trn[iii_nn] == aa, predict==bb))
 
 # hoge = verify_class(qqq_trn,yyy_trn)
 # print(np.sum(hoge[:,0]==hoge[:,1]),"/",hoge.shape[0],"\n")
