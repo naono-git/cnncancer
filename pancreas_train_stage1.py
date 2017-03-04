@@ -19,7 +19,6 @@ from tensorflow_ae_base import *
 import tensorflow_util
 
 import myutil
-from myutil import source
 
 exec(open('extern_params.py').read())
 
