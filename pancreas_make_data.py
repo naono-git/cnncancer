@@ -12,6 +12,7 @@ nx = ny = 32   # image size
 nn = 10000     # number of slices for each image
 
 ### NOTE chage these paths according to your environment
+
 if(os.path.exists('/Users/nono/Documents/data/KPC')):
     dir_img = '/Users/nono/Documents/data/KPC'
 if(os.path.exists('/project/hikaku_db/data/KPC')):
@@ -25,6 +26,7 @@ list_img_file = ('KPC F838-2/HE/KPC-F838-2_2015_08_26_0002.tif',
                  'KPC K-99/K99 Panc HE_s1.tif',
                  'KPCL103/KPCL103 Panc HE.tif') # add more
 dir_data = 'dat1'
+
 ###
 
 data_list = []

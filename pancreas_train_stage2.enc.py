@@ -26,22 +26,11 @@ exec(open('extern_params.py').read())
 #
 
 ss = 32 # sample size
-na = 4
 
-hoge = ('qqq_encode1' in locals())
-if(hoge):
-    fuga = (not qqq_encode1.shape[2] == ss)
-else:
-    fuga = False
-
-if(fuga):
-    tmp = []
-    for aa in range(na):
-        file_input = 'qqq_encode1_tcga_w{}_{}.{}.npy'.format(ss,aa+1,stamp1)
-        path_data = os.path.join(dir_out,file_input)
-        tmp.append(np.load(path_data))
-        print('load input from {}'.format(path_data))
-    qqq_encode1 = np.vstack(tmp)
+file_input = 'pancreas_encode1_w{}.{}.npy'.format(ss,stamp1)
+path_data = os.path.join(dir_data,file_input)
+print('load input from {}'.format(path_data))
+qqq_encode1 = np.load(path_data)
 
 nn,ny,nx,nl = qqq_encode1.shape
 print('nn ny nx nl',nn,ny,nx,nl)
@@ -56,10 +45,10 @@ tf_input = tf.placeholder(tf.float32, [None,ny,nx,nf_encode1])
 tf_encode2 = get_encode2(tf_input)
 tf_deconv2 = get_deconv2(tf_encode2)
 mean_error = tf.reduce_mean(tf.square(tf_deconv2 - tf_input))
-local_entropy = get_local_entropy_encode2(tf_encode2)
-mean_entropy = tf.reduce_mean(local_entropy)
 optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
-train = optimizer.minimize(mean_error + lambda_s*mean_entropy)
+train = optimizer.minimize(mean_error)
+
+sess.run(tf.initialize_all_variables())
 
 #
 # train loop
@@ -68,36 +57,29 @@ iii_bin = np.arange(batch_size,nn,batch_size)
 iii_nn = np.arange(nn)
 iii_batches = np.split(iii_nn,iii_bin)
 
-sess.run(tf.initialize_all_variables())
-
 # extern
 # tmax,tprint = 10,1
 for tt in range(tmax):
     if(tt % tprint==0):
-        tmp = [sess.run([mean_error,mean_entropy],{tf_input: qqq_encode1[iii,]}) for iii in iii_batches]
-        error_out = np.mean([xx[0] for xx in tmp])
-        entropy_out = np.mean([xx[1] for xx in tmp])
-        print(tt,error_out,entropy_out, error_out+lambda_s*entropy_out)
+        tmp = [mean_error.eval({tf_input: qqq_encode1[iii,]}) for iii in iii_batches]
+        error_tmp = np.mean(tmp)
+        print(tt,error_tmp)
     np.random.shuffle(iii_nn)
     iii_batches = np.split(iii_nn,iii_bin)
     for iii in iii_batches:
         sess.run(train,feed_dict={tf_input: qqq_encode1[iii,]})
 
 if(tt < tmax):
-    tmp = [sess.run([mean_error,mean_entropy],{tf_input: qqq_encode1[iii,]}) for iii in iii_batches]
-    error_out = np.mean([xx[0] for xx in tmp])
-    entropy_out = np.mean([xx[1] for xx in tmp])
-    print(tmax,error_out,entropy_out, error_out+lambda_s*entropy_out)
+    tmp = [mean_error.eval({tf_input: qqq_encode1[iii,]}) for iii in iii_batches]
+    error_tmp = np.mean(tmp)
+    print(tt,error_tmp)
 
 #
 # save parameters
 #
-weight2_fin = {k:sess.run(v) for k,v in weight2.items()}
-bias2_fin = {k:sess.run(v) for k,v, in bias2.items()}
-myutil.saveObject(weight2_fin,'weight2.{}.pkl'.format(stamp))
-myutil.saveObject(bias2_fin,'bias2.{}.pkl'.format(stamp))
+save_stage2()
 
 # exec(open('tensorflow_verify_stage2.py').read())
 # exec(open('tensorflow_encode_stage2.py').read())
-myutil.timestamp()
+myutil.show_timestamp()
 print('stamp2 = \'{}\''.format(stamp))

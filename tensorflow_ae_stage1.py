@@ -28,8 +28,8 @@ else:
     file_w1 = 'weight1.{}.pkl'.format(stamp1)
     file_b1 = 'bias1.{}.pkl'.format(stamp1)
 
-    path_w1 = os.path.join('out1',file_w1)
-    path_b1 = os.path.join('out1',file_b1)
+    path_w1 = os.path.join(dir_out,file_w1)
+    path_b1 = os.path.join(dir_out,file_b1)
 
     if(not os.path.exists(path_w1) or not os.path.exists(path_b1)):
         myutil.getRemoteFile([file_w1,file_b1],dirname='Documents/cnncancer/out1')

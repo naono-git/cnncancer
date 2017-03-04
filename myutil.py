@@ -8,14 +8,16 @@ import datetime
 ##def exists(varname):
 ##    print(len(globals()))
 ##    return(varname in locals())
-
-def timestamp():
+def source(filename):
+    exec(open(filename).read())
+    
+def show_timestamp():
     time_cur = datetime.datetime.now()
     print('datetime:',time_cur.strftime('%m/%d %H:%M'))
     stamp = time_cur.strftime('%Y%m%d%H%M')
     return(stamp)
 
-def saveObject(xxx,filename="neko.pkl",dirname='out1'):
+def saveObject(xxx,filename="neko.pkl",dirname=dir_out):
     if(not os.path.exists(dirname)):
         os.makedirs(dirname)
     file_out = open(os.path.join(dirname,filename),'wb')

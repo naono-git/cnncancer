@@ -35,19 +35,19 @@ for k,v in extern_params.items():
 #       
 # current time stamp
 #
-stamp = myutil.timestamp()
+stamp = myutil.show_timestamp()
 print('stamp = ',stamp)
 
 #
 # random seed
 #
 if(random_seed=='NA'):
-    rs = int(stamp)
+    rs = int(stamp) % 4294967295
+    print('random_seed = NA, use tmp seed = ',rs)
     np.random.seed(rs)
-    print('rs = ',rs)
 else:
-    np.random.seed(random_seed)
     print('random_seed = ',random_seed)
+    np.random.seed(random_seed)
 
 #
 # data paths
@@ -76,7 +76,7 @@ if(os.path.exists(dir_Users)):
 
 dir_data = 'dat1'
 if(not 'dir_out' in locals()):
-    dir_out = 'out1'
+    dir_out = 'pan1'
 #
 
 #
@@ -121,7 +121,7 @@ for k,v in network_params.items():
 
 key1 = ['conv1', 'encode1', 'hidden1', 'deconv1']
 key2 = ['conv2', 'encode2', 'hidden2', 'deconv2']
-key3 = ['conv3', 'encode3', 'hidden3', 'deconv3']
+key3 = ['encode', 'decode']
 
 #
 # setup tensorflow session
