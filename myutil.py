@@ -17,7 +17,7 @@ def show_timestamp():
     stamp = time_cur.strftime('%Y%m%d%H%M')
     return(stamp)
 
-def saveObject(xxx,filename="neko.pkl",dirname=dir_out):
+def saveObject(xxx,filename="neko.pkl",dirname='out1'):
     if(not os.path.exists(dirname)):
         os.makedirs(dirname)
     file_out = open(os.path.join(dirname,filename),'wb')

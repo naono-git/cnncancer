@@ -74,9 +74,10 @@ if(os.path.exists(dir_home)):
 if(os.path.exists(dir_Users)):
     dir_input = dir_Users
 
-dir_data = 'dat1'
+if(not 'dir_data' in locals()):
+    dir_data = 'dat1'
 if(not 'dir_out' in locals()):
-    dir_out = 'pan1'
+    dir_out = 'out1'
 #
 
 #

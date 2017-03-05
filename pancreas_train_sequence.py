@@ -22,6 +22,7 @@ import myutil
 
 exec(open('extern_params.py').read())
 
+# extern stamp1 stamp2
 trainable1 = True
 trainable2 = True
 trainable3 = True
@@ -31,18 +32,22 @@ tprint = 1
 
 if(False):
     exec(open('pancreas_make_sample.py').read())
+    exec(open('pancreas_make_compare.py').read())
 
 if(stamp1=='NA'):
+    trainable1 = True
     exec(open('pancreas_train_stage1.py').read())
     stamp1 = stamp
-    trainable1 = False
     exec(open('pancreas_make_encode1.py').read())
 
 if(stamp2=='NA'):
+    trainable1 = False
+    trainable2 = True
     exec(open('pancreas_train_stage2.enc.py').read())
     stamp2 = stamp
-    trainable2 = False
     exec(open('pancreas_make_encode2.py').read())
 
-if(stamp3=='NA'):
-    exec(open('pancreas_train_predict_ki2.py').read())
+
+trainable1 = False
+trainable2 = False
+exec(open('pancreas_train_predict3_ki.py').read())

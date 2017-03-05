@@ -70,8 +70,8 @@ def get_local_entropy_encode1(qqq):
 def save_stage1():
     weight1_fin = {k:sess.run(v) for k,v in weight1.items()}
     bias1_fin = {k:sess.run(v) for k,v, in bias1.items()}
-    myutil.saveObject(weight1_fin,'weight1.{}.pkl'.format(stamp))
-    myutil.saveObject(bias1_fin,'bias1.{}.pkl'.format(stamp))
+    myutil.saveObject(weight1_fin,'weight1.{}.pkl'.format(stamp),dirname=dir_out)
+    myutil.saveObject(bias1_fin,'bias1.{}.pkl'.format(stamp),dirname=dir_out)
     return([weight1_fin,bias1_fin])
 
 

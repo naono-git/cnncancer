@@ -29,11 +29,10 @@ exec(open('extern_params.py').read())
 dir_data = 'dat1'
 
 nx = 32 # sample size
-if(not 'qqq_trn' in locals()):
-    file_input = 'datafile_w{}.npy'.format(nx)
-    path_data = os.path.join(dir_data,file_input)
-    qqq_trn = np.load(path_data)
-    print('load input from {}'.format(path_data))
+file_input = 'pancreas_w{}.npy'.format(nx)
+path_data = os.path.join(dir_data,file_input)
+print('load input from {}'.format(path_data))
+qqq_trn = np.load(path_data)
 
 nn,ny,nx,nl = qqq_trn.shape
 print('nn ny nx nl',nn,ny,nx,nl)
@@ -73,10 +72,7 @@ for tt in range(tmax):
 #
 # save parameters
 #
-weight1_fin = {k:sess.run(v) for k,v in weight1.items()}
-bias1_fin = {k:sess.run(v) for k,v, in bias1.items()}
-myutil.saveObject(weight1_fin,'weight1.{}.pkl'.format(stamp))
-myutil.saveObject(bias1_fin,'bias1.{}.pkl'.format(stamp))
+save_stage1()
 
-myutil.timestamp()
+myutil.show_timestamp()
 print('stamp1 = \'{}\''.format(stamp))
