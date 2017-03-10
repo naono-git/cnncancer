@@ -6,7 +6,7 @@ print('setup classyfiler stage 4')
 
 nf_conv4 = 24
 nf_encode4 = 3
-fs_4a = 32
+fs_4a = 16
 fs_4b = ss // 8 // fs_4a
 key4 = ['conv','encode']
 
