@@ -18,7 +18,11 @@ extern_params = {'random_seed'  : 'NA',
                  'index_filter3': None,
                  # time steps
                  'tmax'      : 3,
-                 'tprint'    : 1}
+                 'tprint'    : 1,
+                 # remote server
+                 'dirname_cur'   : 'Documents/cnncancer_pancreas/out1',
+                 'hostname_cur' : 'csb85',
+                 'portnum_cur'  : None}
 #
 # set default values if they are not defined yet
 #
@@ -87,10 +91,10 @@ if(not 'dir_out' in locals()):
 network_params = {
     # number of  filters
     'nf_RGB'     : 3,
-    'nf_conv1'   : 3,
+    'nf_conv1'   : 6,
     'nf_encode1' : 6,
-    'nf_conv2'   : 6,
-    'nf_encode2' : 6,
+    'nf_conv2'   : 9,
+    'nf_encode2' : 9,
     'nf_conv3'   : 12,
     'nf_encode3' : 12,
     'nf_conv4'   : 24,

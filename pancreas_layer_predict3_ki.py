@@ -29,7 +29,7 @@ else:
     path_b3 = os.path.join(dir_out,file_b3)
 
     if(not os.path.exists(path_w3) or not os.path.exists(path_b3)):
-        myutil.getRemoteFile([file_w3,file_b3],dirname=os.path.join(dir_remote,dir_out))
+        myutil.getRemoteFile([file_w3,file_b3],dirname_cur,hostname_cur,portnum_cur)
 
     weight3 = tensorflow_ae_base.load_tf_variable(path_w3,key3,trainable=trainable3)
     bias3   = tensorflow_ae_base.load_tf_variable(path_b3,key3,trainable=trainable3)

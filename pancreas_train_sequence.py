@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # <nbformat>3.0</nbformat>
 
-print('train stacked autoencoder stage 1')
+print('train stacked autoencoder stage1 to stage3')
 
 import os
 import sys

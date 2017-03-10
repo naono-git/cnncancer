@@ -25,7 +25,7 @@ def saveObject(xxx,filename="neko.pkl",dirname='out1'):
     file_out.close()
     print(filename)
 
-def getRemoteFile(filename,dirname='Documents/cnncancer/out1',hostname='127.0.0.1',portnum='20052',dst='out1'):
+def getRemoteFile(filename,dirname='Documents/cnncancer_pancreas/out1',hostname='127.0.0.1',portnum='20052',dst='out1'):
     if(portnum==None):
         portoption = ''
     else:
