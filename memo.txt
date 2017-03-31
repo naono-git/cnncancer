@@ -1,0 +1,2 @@
+sd = 0.3
+sd = 0.4 does not converge
