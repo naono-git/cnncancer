@@ -3,7 +3,7 @@
 # <nbformat>3.0</nbformat>
 
 print('train stacked autoencoder stage 1')
-
+## exec(open('pancreas_train_sequence.py').read())
 import os
 import sys
 import csv
@@ -27,8 +27,8 @@ trainable1 = True
 trainable2 = True
 trainable3 = True
 trainable4 = True
-tmax = 10
-tprint = 1
+tmax = 200
+tprint = 20
 
 if(False):
     exec(open('pancreas_make_sample.py').read())
@@ -48,6 +48,6 @@ if(stamp2=='NA'):
     exec(open('pancreas_make_encode2.py').read())
 
 
-trainable1 = False
-trainable2 = False
+trainable1 = True
+trainable2 = True
 exec(open('pancreas_train_predict3_ki.py').read())

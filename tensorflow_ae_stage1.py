@@ -12,10 +12,14 @@ print('setup stacked autoencoder stage1')
 if(stamp1=='NA'):
     print('initialize w1 and b1 randomly')
     weight1 = {
-        'conv1':   tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_RGB,nf_conv1],stddev=0.05),trainable=trainable1,name='conv1.ww'),
-        'encode1': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_conv1,nf_encode1],stddev=0.05),trainable=trainable1),
-        'hidden1': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_encode1,nf_conv1],stddev=0.05),trainable=trainable1),
-        'deconv1': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_conv1,nf_RGB],stddev=0.05),trainable=trainable1),
+        'conv1':   tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_RGB,nf_conv1],stddev=0.1),
+                               trainable=trainable1,name='weight.conv1'),
+        'encode1': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_conv1,nf_encode1],stddev=0.1),
+                               trainable=trainable1,name='weight.encode1'),
+        'hidden1': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_encode1,nf_conv1],stddev=0.1),
+                               trainable=trainable1,name='weight.hidden1'),
+        'deconv1': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_conv1,nf_RGB],stddev=0.1),
+                               trainable=trainable1,name='weight.deconv1'),
     }
     bias1 = {
         'conv1':   tf.Variable(tf.zeros([nf_conv1]),trainable=trainable1,name='conv1.bb'),
@@ -44,13 +48,13 @@ else:
 
 def get_encode1(qqq):
     conv1   = tf.nn.relu(conv2d(qqq,    weight1['conv1'],  bias1['conv1']))
-    pool1   = max_pool(conv1,kk=pool_size)
+    pool1   = max_pool(conv1,kk=ps_1)
     encode1 = tf.nn.relu(conv2d(pool1,  weight1['encode1'],bias1['encode1']))
     return(encode1)
 
 def get_deconv1(qqq):
     hidden1 = tf.nn.relu(conv2d(qqq,    weight1['hidden1'],bias1['hidden1']))
-    unpool1 = un_pool(hidden1,kk=pool_size)
+    unpool1 = un_pool(hidden1,kk=ps_1)
     deconv1 = tf.nn.relu(conv2d(unpool1,weight1['deconv1'],bias1['deconv1']))
     return(deconv1)
 

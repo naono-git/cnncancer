@@ -40,7 +40,7 @@ qqq_dst = np.load(path_dst)
 nn,ny,nx,nl = qqq_src.shape
 print('nn ny nx nl',nn,ny,nx,nl)
 exec(open('tensorflow_ae_stage1.py').read())
-exec(open('tensorflow_ae_stage1.py').read())
+exec(open('tensorflow_ae_stage2.py').read())
 exec(open('pancreas_layer_predict3_ki.py').read())
 
 #
@@ -56,7 +56,7 @@ mean_error = tf.reduce_mean(tf.square(tf_predict - tf_dst3))
 optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
 train = optimizer.minimize(mean_error)
 
-sess.run(tf.initialize_all_variables())
+sess.run(tf.global_variables_initializer())
 
 #
 # train loop
@@ -78,11 +78,12 @@ for tt in range(tmax):
 #
 # save parameters
 #
+myutil.show_timestamp()
+
 if(trainable1):
     save_stage1()
 if(trainable2):
     save_stage2()
-save_stage3()
-
-myutil.show_timestamp()
-print('stamp3 = \'{}\''.format(stamp))
+if(True):
+    save_stage3()
+    print('stamp3 = \'{}\''.format(stamp))

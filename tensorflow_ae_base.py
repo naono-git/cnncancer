@@ -22,10 +22,10 @@ def un_pool_2(xxx):
     d1 = ddd[1].value
     d2 = ddd[2].value
     d3 = ddd[3].value
-    yyy0 = tf.pack([xxx,xxx])
+    yyy0 = tf.stack([xxx,xxx])
     zzz0 = tf.transpose(yyy0,[1,2,0,3,4])
     xxx1 = tf.reshape(zzz0,[-1,d1*2,d2,d3])
-    yyy1 = tf.pack([xxx1,xxx1])
+    yyy1 = tf.stack([xxx1,xxx1])
     zzz1 = tf.transpose(yyy1,[1,2,3,0,4])
     xxx2 = tf.reshape(zzz1,[-1,d1*2,d2*2,d3])
     return xxx2
@@ -41,12 +41,12 @@ def un_pool(xxx, kk):
     d3 = ddd[3].value
     yyy0 = xxx
     for ii in range(0,kk-1):
-        yyy0 = tf.pack([yyy0,xxx])
+        yyy0 = tf.stack([yyy0,xxx])
     zzz0 = tf.transpose(yyy0,[1,2,0,3,4])
     xxx1 = tf.reshape(zzz0,[-1,d1*kk,d2,d3])
     yyy1 = xxx1
     for ii in range(0,kk-1):
-        yyy1 = tf.pack([yyy1,xxx1])
+        yyy1 = tf.stack([yyy1,xxx1])
     zzz1 = tf.transpose(yyy1,[1,2,3,0,4])
     xxx2 = tf.reshape(zzz1,[-1,d1*kk,d2*kk,d3])
     return xxx2

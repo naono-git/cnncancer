@@ -33,6 +33,7 @@ list_img_file_he = ('KPC F838-2/HE/KPC-F838-2_2015_08_26_0002.tif',6732, 1332)
 list_img_file_ki = ('KPC F838-2/Ki67/KPC-F838-2_2015_10_05_0010.tif',6748, 1148)
 
 xs,ys = 1024,1024
+
 path_src = os.path.join(dir_data,'img0_1K.tif')
 if(True):
     img0_1K = Image.open(path_src,'r')
@@ -56,29 +57,54 @@ else:
 qqq_vry_src = np.asarray(img0_1K)[np.newaxis] / 255.0
 qqq_vry_dst = np.asarray(img1_1K)[np.newaxis] / 255.0
 
-ny,nx,nl = data_src.shape
+nn,ny,nx,nl = qqq_vry_src.shape
 nn = 1
 print('ny nx nl',ny,nx,nl)
 exec(open('tensorflow_ae_stage1.py').read())
-exec(open('pancreas_ki2.py').read())
+exec(open('tensorflow_ae_stage2.py').read())
+exec(open('pancreas_layer_predict3_ki.py').read())
 
 tf_src = tf.placeholder(tf.float32, [None,ny,nx,nl])
 tf_dst = tf.placeholder(tf.float32, [None,ny,nx,nl])
-tf_dst2 = get_dist2(tf_dst)
+tf_src3 = get_dist3(tf_src)
+tf_dst3 = get_dist3(tf_dst)
 tf_encode1 = get_encode1(tf_src)
-tf_predict = get_predict2(tf_encode1)
-mean_error = tf.reduce_mean(tf.square(tf_predict - tf_dst2))
+tf_encode2 = get_encode2(tf_encode1)
+tf_predict3 = get_predict3(tf_encode2)
+mean_error = tf.reduce_mean(tf.square(tf_predict3 - tf_dst3))
 
-sess.run(tf.initialize_all_variables())
+sess.run(tf.global_variables_initializer())
 
 mean_error.eval({tf_src: qqq_vry_src,tf_dst: qqq_vry_dst})
 hoge = tf_encode1.eval({tf_src: qqq_vry_src})
 fuga = tensorflow_util.get_image_from_encode(hoge)
-fuga.show()
+# fuga.show()
 
-qqq_predict = tf_predict.eval({tf_src: qqq_vry_src})
-img_out = tensorflow_util.get_image_from_encode(qqq_predict)
-img_out.show()
+qqq_dst3 = tf_dst3.eval({tf_dst: qqq_vry_dst})
+img_dst3 = tensorflow_util.get_image_from_qqq(qqq_dst3)
+img_dst3.save('out1/dst3.jpg'.format(stamp3))
 
-img_out = tensorflow_util.get_image_from_qqq(qqq_predict)
-img_out.show()
+np.savetxt('out1/qqq_dst.txt',qqq_dst3.reshape((256,256*3)))
+np.savetxt('out1/qqq_predict3.txt',qqq_predict3.reshape((256,256*3)))
+
+qqq_predict3 = tf_predict3.eval({tf_src: qqq_vry_src})
+# img_out = tensorflow_util.get_image_from_encode(qqq_predict)
+img_out = tensorflow_util.get_image_from_qqq(qqq_predict3)
+# img_out.show()
+img_out.save('out1/predict3.{}.jpg'.format(stamp3))
+
+qqq_src3 = tf_src3.eval({tf_src: qqq_vry_src})
+img_src3 = tensorflow_util.get_image_from_qqq(qqq_src3)
+img_cmp = myutil.cbind_image(myutil.cbind_image(img_src3,img_out),img_dst3)
+img_cmp.save('out1/cmp3.{}.jpg'.format(stamp3))
+
+img_w1 = tensorflow_util.get_image_from_ww(weight1['deconv1'].eval()[:,:,:,0])
+img_w1 = myutil.cbind_image(img_w1,tensorflow_util.get_image_from_ww(weight1['deconv1'].eval()[:,:,:,1]))
+img_w1 = myutil.cbind_image(img_w1,tensorflow_util.get_image_from_ww(weight1['deconv1'].eval()[:,:,:,2]))
+img_w1 = myutil.cbind_image(img_w1,tensorflow_util.get_image_from_ww(weight1['deconv1'].eval()[:,:,:,3]))
+img_w1 = myutil.cbind_image(img_w1,tensorflow_util.get_image_from_ww(weight1['deconv1'].eval()[:,:,:,4]))
+img_w1 = myutil.cbind_image(img_w1,tensorflow_util.get_image_from_ww(weight1['deconv1'].eval()[:,:,:,5]))
+img_w1.save('out1/img_w1.jpg')
+
+qqq_encode2 = tf_encode2.eval({tf_src: qqq_vry_src})
+np.savetxt('out1/qqq_encode2.txt',qqq_encode2.reshape((256,256*12)))

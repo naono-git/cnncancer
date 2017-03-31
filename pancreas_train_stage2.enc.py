@@ -48,7 +48,7 @@ mean_error = tf.reduce_mean(tf.square(tf_deconv2 - tf_input))
 optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
 train = optimizer.minimize(mean_error)
 
-sess.run(tf.initialize_all_variables())
+sess.run(tf.global_variables_initializer())
 
 #
 # train loop
@@ -72,7 +72,7 @@ for tt in range(tmax):
 if(tt < tmax):
     tmp = [mean_error.eval({tf_input: qqq_encode1[iii,]}) for iii in iii_batches]
     error_tmp = np.mean(tmp)
-    print(tt,error_tmp)
+    print(tmax,error_tmp)
 
 #
 # save parameters

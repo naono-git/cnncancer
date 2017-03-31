@@ -7,7 +7,7 @@ print('setup classyfiler stage 4')
 nf_conv4 = 24
 nf_encode4 = 3
 key4 = ['conv','encode']
-xx_4 = ss//2//2//2//fs_4
+## xx_4 = ss//2//2//2//fs_4
 if(stamp4=='NA'):
     print('initialize w4 and b4 randomly')
     weight4 = {

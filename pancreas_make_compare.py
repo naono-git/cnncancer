@@ -1,6 +1,6 @@
 from PIL import Image
 
-dir_img = '/Users/nono/Documents/data/KPC/'
+## dir_img = '/Users/nono/Documents/data/KPC/'
 
 list_img_file_he = ('KPC F838-2/HE/KPC-F838-2_2015_08_26_0002.tif',6732, 1332)
 
@@ -10,14 +10,14 @@ xs,ys = 1024,1024
 
 ff_src = list_img_file_he[0]
 x0,y0 = list_img_file_he[1],list_img_file_he[2]
-path_src = os.path.join(dir_img,ff_src)
+path_src = os.path.join(dir_image,ff_src)
 img_src = Image.open(path_src,'r')
 img_src_1K = img_src.crop((x0,y0,x0+xs,y0+ys))
 # img_src_1K.save('pancreas_compare/img_src_1K_1.tif')
 
 ff_dst = list_img_file_ki[0]
 x1,y1 = list_img_file_ki[1],list_img_file_ki[2]
-path_dst = os.path.join(dir_img,ff_dst)
+path_dst = os.path.join(dir_image,ff_dst)
 img_dst = Image.open(path_dst,'r')
 img_dst_1K = img_dst.crop((x1,y1,x1+xs,y1+ys))
 # img_dst_1K.save('pancreas_compare/img_dst_1K_1.tif')

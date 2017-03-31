@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # <nbformat>3.0</nbformat>
 
-print('train stacked autoencoder stage 1')
+print('verify stacked autoencoder stage 1')
 
 import os
 import sys
@@ -23,61 +23,36 @@ from myutil import source
 
 exec(open('extern_params.py').read())
 
-
 #
 # load sample data
 #
 dir_data = 'dat1'
 
-nx = 32 # sample size
-if(not 'qqq_trn' in locals()):
-    file_input = 'datafile_w{}.npy'.format(nx)
-    path_data = os.path.join(dir_data,file_input)
-    qqq_trn = np.load(path_data)
-    print('load input from {}'.format(path_data))
-
-nn,ny,nx,nl = qqq_trn.shape
 print('nn ny nx nl',nn,ny,nx,nl)
 exec(open('tensorflow_ae_stage1.py').read())
 
+qqq_src = np.asarray(img1_1K)[np.newaxis] / 255.0
+nn,ny,nx,nl = qqq_src.shape
 #
 # setup optimizer
 #
-qqq_input = tf.placeholder(tf.float32, [None,ny,nx,nl])
-qqq_encode1 = get_encode1(qqq_input)
-qqq_deconv1 = get_deconv1(qqq_encode1)
-mean_error = tf.reduce_mean(tf.square(qqq_deconv1 - qqq_input))
-#local_entropy = get_local_entropy_encode1(qqq_encode1)
-#mean_entropy = tf.reduce_mean(local_entropy)
-optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
-#train = optimizer.minimize(mean_error + lambda_s*mean_entropy)
-train = optimizer.minimize(mean_error)
+tf_src = tf.placeholder(tf.float32, [None,ny,nx,nl])
+tf_encode1 = get_encode1(tf_src)
+tf_deconv1 = get_deconv1(tf_encode1)
+mean_error = tf.reduce_mean(tf.square(tf_deconv1 - tf_src))
 
-#
-# train loop
-#
-iii_bin = np.arange(batch_size,nn,batch_size)
-iii_nn = np.arange(nn)
-iii_batches = np.split(iii_nn,iii_bin)
+sess.run(tf.global_variables_initializer())
 
-sess.run(tf.initialize_all_variables())
+mean_error.eval({tf_src:qqq_src})
 
-for tt in range(tmax):
-    if(tt % tprint==0):
-        error_out = np.mean([sess.run(mean_error,{qqq_input: qqq_trn[iii,]}) for iii in iii_batches])
-        print(tt,error_out)
-    np.random.shuffle(iii_nn)
-    iii_batches = np.split(iii_nn,iii_bin)
-    for iii in iii_batches:
-        sess.run(train,feed_dict={qqq_input: qqq_trn[iii,]})
+qqq_encode1 = tf_encode1.eval({tf_src: qqq_src})
+img_encode1 = tensorflow_util.get_image_from_encode(qqq_encode1)
+img_encode1.save('out1/encode1.{}.jpg'.format(stamp1))
+qqq_deconv1 = tf_deconv1.eval({tf_src: qqq_src})
+img_out = tensorflow_util.get_image_from_qqq(qqq_deconv1)
 
-#
-# save parameters
-#
-weight1_fin = {k:sess.run(v) for k,v in weight1.items()}
-bias1_fin = {k:sess.run(v) for k,v, in bias1.items()}
-myutil.saveObject(weight1_fin,'weight1.{}.pkl'.format(stamp))
-myutil.saveObject(bias1_fin,'bias1.{}.pkl'.format(stamp))
+img_cmp = myutil.cbind_image(img0_1K,img_out)
+img_cmp.save('out1/cmp1.{}.jpg'.format(stamp1))
 
-myutil.timestamp()
-print('stamp1 = \'{}\''.format(stamp))
+for aa in range(12):
+    np.savetxt('out1/qqq_encode2_{}.txt'.format(aa+1),qqq_encode2[0,:,:,aa])

@@ -73,6 +73,7 @@ for tt in range(tmax):
 # save parameters
 #
 save_stage1()
+pickle.dump(network_params,open('network_params.{}.pkl'.format(stamp),'wb'))
 
 myutil.timestamp()
 print('stamp1 = \'{}\''.format(stamp))

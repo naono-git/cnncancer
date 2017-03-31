@@ -8,17 +8,15 @@ extern_params = {'random_seed'  : 'NA',
                  'stamp1'       : 'NA',
                  'stamp2'       : 'NA',
                  'stamp3'       : 'NA',
-                 'stamp4'       : 'NA',
                  'trainable1'   : True,
                  'trainable2'   : True,
                  'trainable3'   : True,
-                 'trainable4'   : True,
-                 'index_filter1': None,
-                 'index_filter2': None,
-                 'index_filter3': None,
                  # time steps
                  'tmax'      : 3,
-                 'tprint'    : 1}
+                 'tprint'    : 1,
+                 # learning parameters
+                 'learning_rate' : 1e-3,
+                 'batch_size'    : 32}
 #
 # set default values if they are not defined yet
 #
@@ -45,6 +43,7 @@ if(random_seed=='NA'):
     rs = int(stamp) % 4294967295
     print('random_seed = NA, use tmp seed = ',rs)
     np.random.seed(rs)
+    random_seed = rs
 else:
     print('random_seed = ',random_seed)
     np.random.seed(random_seed)
@@ -87,36 +86,24 @@ if(not 'dir_out' in locals()):
 network_params = {
     # number of  filters
     'nf_RGB'     : 3,
-    'nf_conv1'   : 3,
+    'nf_conv1'   : 6,
     'nf_encode1' : 6,
-    'nf_conv2'   : 6,
-    'nf_encode2' : 6,
-    'nf_conv3'   : 12,
-    'nf_encode3' : 12,
-    'nf_conv4'   : 24,
-    'nf_class4'  : 3,
+    'nf_conv2'   : 12,
+    'nf_encode2' : 12,
+    'nf_conv3'   : 24,
+    'nf_encode3' : 24,
     # filter size and pad size
-    'fs_1' : 7,
-    'ps_1' : 3,
-    'fs_2' : 5,
-    'ps_2' : 2,
+    'fs_1' : 5,
+    'fs_2' : 3,
     'fs_3' : 3,
-    'ps_3' : 1,
-    'fs_4' : 16,
-    'pool_size' : 2,
-    # learning parameters
-    'lambda_s'      : 1e-5,
-    'learning_rate' : 0.01,
-    'batch_size'    : 32}
+    'pool_size' : 2}
 #
 
 # always overwrite
 for k,v in network_params.items():
     if(type(v)==str):
-        print('{} = \'{}\''.format(k,v))
         exec( '{} = \'{}\''.format(k,v),globals(),locals())
     else:
-        print('{} = {}'.format(k,v))
         exec('{} = {}'.format(k,v),globals(),locals())
 #
 
@@ -141,3 +128,11 @@ def get_params():
         params[kk] = globals()[kk]
     return(params)
 #
+
+def save_params(dir_params='.'):
+    params = get_params()
+    path_params = os.path.join(dir_params,'params.{}.pkl'.format(stamp))
+    pickle.dump(params,open(path_params,'wb'))
+    print(path_params)
+    return(path_params)
+
