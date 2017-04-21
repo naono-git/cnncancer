@@ -1,1 +1,0 @@
-../../cnnspot/out1/bias1c.201604061609.pkl
