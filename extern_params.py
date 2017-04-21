@@ -4,6 +4,41 @@
 
 import myutil
 
+def save_params(dirname='.'):
+    path_params = os.path.join(dirname, 'params.{}.pkl'.format(stamp))
+    pickle.dump((extern_params,network_params),open(path_params,'wb'))
+    print(path_params)
+    return(path_params)
+
+def save_params_txt(dirname='.'):
+    path_params = os.path.join(dirname, 'params.{}.txt'.format(stamp))
+    with open(path_params, "w") as fout:
+        for k,v in extern_params.items():
+            if(type(v)==str):
+                print('{} = \'{}\''.format(k,v),file=fout)
+            else:
+                print('{} = {}'.format(k,v),file=fout)
+        for k,v in network_params.items():
+            if(type(v)==str):
+                print('{} = \'{}\''.format(k,v),file=fout)
+            else:
+                print('{} = {}'.format(k,v),file=fout)
+
+extern_params_table = """\
+random_seed = 'NA'
+stamp1 = 'NA'
+stamp2 = 'NA'
+stamp3 = 'NA'
+trainable1 = 'NA'
+trainable2 = 'NA'
+trainable3 = 'NA'
+tmax   = 3
+tprint = 1
+learning_rate = 1e-3
+keep_prob_1   = 1.0
+batch_size    = 32
+\
+"""
 extern_params = {'random_seed'  : 'NA',
                  'stamp1'       : 'NA',
                  'stamp2'       : 'NA',
@@ -16,6 +51,8 @@ extern_params = {'random_seed'  : 'NA',
                  'tprint'    : 1,
                  # learning parameters
                  'learning_rate' : 1e-3,
+                 'lambda_risa'   : 0,
+                 'keep_prob_1'   : 1.0,
                  'batch_size'    : 32}
 #
 # set default values if they are not defined yet
@@ -28,6 +65,8 @@ for k,v in extern_params.items():
         else:
             print('{} = {}'.format(k,v))
             exec('{} = {}'.format(k,v),globals(),locals())
+    else:
+        extern_params[k] = globals()[k]
 #
 
 #       
@@ -86,15 +125,15 @@ if(not 'dir_out' in locals()):
 network_params = {
     # number of  filters
     'nf_RGB'     : 3,
-    'nf_conv1'   : 6,
-    'nf_encode1' : 6,
-    'nf_conv2'   : 12,
-    'nf_encode2' : 12,
-    'nf_conv3'   : 24,
-    'nf_encode3' : 24,
+    'nf_conv1'   : 3,
+    'nf_encode1' : 3,
+    'nf_conv2'   : 6,
+    'nf_encode2' : 6,
+    'nf_conv3'   : 12,
+    'nf_encode3' : 12,
     # filter size and pad size
-    'fs_1' : 5,
-    'fs_2' : 3,
+    'fs_1' : 7,
+    'fs_2' : 5,
     'fs_3' : 3,
     'pool_size' : 2}
 #
@@ -107,8 +146,7 @@ for k,v in network_params.items():
         exec('{} = {}'.format(k,v),globals(),locals())
 #
 
-key1 = ['conv1', 'encode1', 'hidden1', 'deconv1']
-key2 = ['conv2', 'encode2', 'hidden2', 'deconv2']
+key2 = ['conv', 'encode', 'hidden', 'deconv']
 key3 = ['encode', 'decode']
 
 #
@@ -119,20 +157,3 @@ if(not 'sess' in locals()):
     print('create a new interactive session')
     sess = tf.InteractiveSession()
 #
-
-def get_params():
-    params = dict()
-    for kk in extern_params.keys():
-        params[kk] = globals()[kk]
-    for kk in network_params.keys():
-        params[kk] = globals()[kk]
-    return(params)
-#
-
-def save_params(dir_params='.'):
-    params = get_params()
-    path_params = os.path.join(dir_params,'params.{}.pkl'.format(stamp))
-    pickle.dump(params,open(path_params,'wb'))
-    print(path_params)
-    return(path_params)
-
