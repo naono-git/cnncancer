@@ -47,6 +47,7 @@ extern_params = {'random_seed'  : 'NA',
                  'trainable2'   : True,
                  'trainable3'   : True,
                  # time steps
+                 'tglobal'   : 0,
                  'tmax'      : 3,
                  'tprint'    : 1,
                  # learning parameters

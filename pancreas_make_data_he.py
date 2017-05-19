@@ -44,25 +44,29 @@ dir_data = 'dat1'
 data_list = []
 data_set = np.empty((nn,nx,ny,nl),np.float32)
 
-for ff in list_img_file:
+## for ff in list_img_file:
+for aa in range(2):
+    ff = list_img_file[aa]
     print(ff)
     path_img = os.path.join(dir_img,ff)
     img_src = Image.open(path_img,'r')
     mx,my = img_src.size
     ii = 0
+    file_tmp = open('tmp.{}.txt'.format(aa),'w')
     while ii < nn:
-        x0 = np.random.choice(range(mx-nx),size=1)
-        y0 = np.random.choice(range(my-ny),size=1)
+        x0 = np.random.choice(range(mx-nx),size=1)[0]
+        y0 = np.random.choice(range(my-ny),size=1)[0]
         img_tmp = img_src.crop((x0,y0,x0+nx,y0+ny))
-        qqq_tmp = np.asarray(img_tmp) / 256.0
+        qqq_tmp = np.asarray(img_tmp,dtype=np.float32) / 256.0
         sd_tmp = np.std(np.asarray(img_tmp))
-        if sd_tmp < 16 :
+        if sd_tmp < 60 :
             continue # skip (almost) blank subframe
-        print(np.mean(qqq_tmp,axis=(0,1,2)))
+        hoge = np.mean(qqq_tmp,axis=(0,1))
+        print("{}\t{}\t{}\t{}".format(hoge[0],hoge[1],hoge[2],sd_tmp),file=file_tmp)
         data_set[ii,] = qqq_tmp
         ii += 1
     data_list.append(data_set)
 
 data_all = np.vstack(data_list)
-## print(data_all.shape)
-## np.save(os.path.join(dir_data,'pancreas_w{}.npy').format(nx),data_all)
+print(data_all.shape)
+np.save(os.path.join(dir_data,'pancreas_he_w{}.npy').format(nx),data_all)
