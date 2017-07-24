@@ -8,55 +8,53 @@ print('setup stacked autoencoder stage1')
 # setup parameters
 #
 
-key1 = ['conv', 'encode', 'hidden', 'deconv']
+key1 = ['enconv', 'encode', 'decode', 'deconv']
 
 # extern stamp1,trainable1
 sd0 = 0.2
+
+weight1 = {
+    'enconv': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_RGB,nf_enconv1],stddev=sd0),trainable=trainable1,name='weight1.enconv'),
+    'encode': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_enconv1,nf_encode1],stddev=sd0),trainable=trainable1,name='weight1.encode'),
+    'decode': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_encode1,nf_enconv1],stddev=sd0),trainable=trainable1,name='weight1.decode'),
+    'deconv': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_enconv1,nf_RGB],stddev=sd0),trainable=trainable1,name='weight1.deconv'),
+}
+bias1 = {
+    'enconv': tf.Variable(tf.zeros([nf_enconv1]),trainable=trainable1, name='bias1.enconv'),
+    'encode': tf.Variable(tf.zeros([nf_encode1]),trainable=trainable1, name='bias1.encode'),
+    'decode': tf.Variable(tf.zeros([nf_enconv1]),trainable=trainable1, name='bias1.decode'),
+    'deconv': tf.Variable(tf.zeros([nf_RGB]    ),trainable=trainable1, name='bias1.deconv'),
+}
+
 if(stamp1=='NA'):
     print('initialize w1 and b1 randomly. sd0 = ',sd0)
-    weight1 = {
-        'conv':   tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_RGB,nf_conv1],stddev=sd0),
-                               trainable=trainable1,name='weight.conv1'),
-        'encode': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_conv1,nf_encode1],stddev=sd0),
-                               trainable=trainable1,name='weight.encode1'),
-        'hidden': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_encode1,nf_conv1],stddev=sd0),
-                               trainable=trainable1,name='weight.hidden1'),
-        'deconv': tf.Variable(tf.truncated_normal([fs_1,fs_1,nf_conv1,nf_RGB],stddev=sd0),
-                               trainable=trainable1,name='weight.deconv1'),
-    }
-    bias1 = {
-        'conv':   tf.Variable(tf.zeros([nf_conv1]),trainable=trainable1,name='conv1.bb'),
-        'encode': tf.Variable(tf.zeros([nf_encode1]),trainable=trainable1),
-        'hidden': tf.Variable(tf.zeros([nf_conv1]),trainable=trainable1),
-        'deconv': tf.Variable(tf.zeros([nf_RGB]),trainable=trainable1),
-    }
-    tglobal+=1
 else:
     print('load w1 and b1 from',stamp1)
-    if(stype==''):
-        file_w1 = 'weight1.{}.pkl'.format(stamp1)
-        file_b1 = 'bias1.{}.pkl'.format(stamp1)
-    else:
-        file_w1 = 'weight1.{}.{}.pkl'.format(stype,stamp1)
-        file_b1 = 'bias1.{}.{}.pkl'.format(stype,stamp1)
+    tf_saver.restore(sess,'out1/cnncancer_pancreas_he-{}'.format(stap1))
+#     if(stype==''):
+#         file_w1 = 'weight1.{}.pkl'.format(stamp1)
+#         file_b1 = 'bias1.{}.pkl'.format(stamp1)
+#     else:
+#         file_w1 = 'weight1.{}.{}.pkl'.format(stype,stamp1)
+#         file_b1 = 'bias1.{}.{}.pkl'.format(stype,stamp1)
 
-    path_w1 = os.path.join(dir_out,file_w1)
-    path_b1 = os.path.join(dir_out,file_b1)
+#     path_w1 = os.path.join(dir_out,file_w1)
+#     path_b1 = os.path.join(dir_out,file_b1)
 
-    if(not os.path.exists(path_w1) or not os.path.exists(path_b1)):
-        myutil.getRemoteFile([file_w1,file_b1],dirname='Documents/cnncancer/out1')
+#     if(not os.path.exists(path_w1) or not os.path.exists(path_b1)):
+#         myutil.getRemoteFile([file_w1,file_b1],dirname='Documents/cnncancer/out1')
     
-    weight1 = tensorflow_ae_base.load_tf_variable(path_w1,key1,trainable=trainable1)
-    bias1   = tensorflow_ae_base.load_tf_variable(path_b1,key1,trainable=trainable1)
-#end if(stamp=='NA')
+#     weight1 = tensorflow_ae_base.load_tf_variable(path_w1,key1,trainable=trainable1)
+#     bias1   = tensorflow_ae_base.load_tf_variable(path_b1,key1,trainable=trainable1)
+# #end if(stamp=='NA')
 
 #
 # setup layers
 #
 
 def get_conv1(tf_input):
-    tf_1 = tf.nn.conv2d(tf_input, weight1['conv'], strides=[1, 1, 1, 1], padding='SAME')
-    tf_2 = tf.nn.bias_add(tf_1, bias1['conv'])
+    tf_1 = tf.nn.conv2d(tf_input, weight1['enconv'], strides=[1, 1, 1, 1], padding='SAME')
+    tf_2 = tf.nn.bias_add(tf_1, bias1['enconv'])
     tf_conv = tf.nn.relu(tf_2)
     return(tf_conv)
 
@@ -92,18 +90,18 @@ def get_encode1(tf_conv):
 
 def get_deconv1(tf_encode):
     tf_tmp = tf_encode
-    ## tf_tmp = tf.nn.relu(conv2d(tf_encode, weight1['hidden'], bias1['hidden']))
+    ## tf_tmp = tf.nn.relu(conv2d(tf_encode, weight1['decode'], bias1['decode']))
     ## tf_tmp = un_pool(tf_tmp, kk=pool_size)
     ## tf_tmp = tf.nn.relu(conv2d(tf_tmp, weight1['deconv'], bias1['deconv']))
-    tf_tmp = tf.nn.conv2d(tf_tmp, weight1['hidden'], 
+    tf_tmp = tf.nn.conv2d(tf_tmp, weight1['decode'], 
                          ## outputf_shape=[batch_size, ny//2, nx//2, nf_conv1], 
                          strides=[1, 1, 1, 1], padding='SAME')
-    tf_tmp = tf.nn.bias_add(tf_encode, bias1['hidden'])
+    tf_tmp = tf.nn.bias_add(tf_encode, bias1['decode'])
     tf_tmp = tf.nn.relu(tf_tmp)
 
     tf_tmp = un_pool(tf_tmp, kk=pool_size)
 
-    ##tf_tmp = tf.nn.conv2d_transpose(tf_tmp, weight1['conv'], 
+    ##tf_tmp = tf.nn.conv2d_transpose(tf_tmp, weight1['enconv'], 
     ##                               output_shape=[batch_size, ny, nx, nf_RGB],
     ##                               strides=[1, 1, 1, 1], padding='SAME')
     tf_tmp = tf.nn.conv2d(tf_tmp, weight1['deconv'], 

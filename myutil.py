@@ -8,6 +8,8 @@ import datetime
 ##def exists(varname):
 ##    print(len(globals()))
 ##    return(varname in locals())
+# def read_parameter(filename, overwrite=True):
+    
 def source(filename):
     exec(open(filename).read())
     
@@ -55,6 +57,10 @@ def openRemoteImage(filename,dirname='Documents/cnnspot/out1',hostname='127.0.0.
     os.system(cmd)
 
 def cbind_image(img1, img2):
+    if img1 is None:
+        return(img2)
+    if img2 is None:
+        return(img1)
     new_size = (img1.size[0]+img2.size[0], np.max([img1.size[1],img2.size[1]]))
     new_im = Image.new('RGB', new_size)
     new_im.paste(img1, (0,0))
@@ -62,6 +68,10 @@ def cbind_image(img1, img2):
     return(new_im)
 
 def rbind_image(img1, img2):
+    if img1 is None:
+        return(img2)
+    if img2 is None:
+        return(img1)        
     new_size = (np.max([img1.size[0],img2.size[0]]),img1.size[1]+img2.size[1])
     new_im = Image.new('RGB', new_size)
     new_im.paste(img1, (0,0))

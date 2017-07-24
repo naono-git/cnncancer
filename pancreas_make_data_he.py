@@ -10,10 +10,11 @@ print('random_seed',random_seed)
 nl = 3
 
 nx = ny = 32   # image size
-nn = 10240     # number of slices for each image
+nn = 10240
+## nn = 10240     # number of slices for each image
 
-#nx = ny = 64   # image size
-#nn = 2560      # number of slices for each image
+##nx = ny = 64   # image size
+##nn = 2560      # number of slices for each image
 
 #nx = ny = 128  # image size
 #nn = 1280      # number of slices for each image
@@ -42,16 +43,16 @@ dir_data = 'dat1'
 ###
 
 data_list = []
-data_set = np.empty((nn,nx,ny,nl),np.float32)
 
 ## for ff in list_img_file:
-for aa in range(2):
+for aa in range(7):
     ff = list_img_file[aa]
     print(ff)
     path_img = os.path.join(dir_img,ff)
     img_src = Image.open(path_img,'r')
     mx,my = img_src.size
     ii = 0
+    data_set = np.zeros((nn,nx,ny,nl),np.float32)
     file_tmp = open('tmp.{}.txt'.format(aa),'w')
     while ii < nn:
         x0 = np.random.choice(range(mx-nx),size=1)[0]
@@ -59,7 +60,7 @@ for aa in range(2):
         img_tmp = img_src.crop((x0,y0,x0+nx,y0+ny))
         qqq_tmp = np.asarray(img_tmp,dtype=np.float32) / 256.0
         sd_tmp = np.std(np.asarray(img_tmp))
-        if sd_tmp < 60 :
+        if (sd_tmp < 10 or sd_tmp > 65):
             continue # skip (almost) blank subframe
         hoge = np.mean(qqq_tmp,axis=(0,1))
         print("{}\t{}\t{}\t{}".format(hoge[0],hoge[1],hoge[2],sd_tmp),file=file_tmp)

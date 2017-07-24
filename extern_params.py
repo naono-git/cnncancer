@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 # <nbformat>3.0</nbformat>
 
+import os
+import numpy as np
+
 import myutil
 
 def save_params(dirname='.'):
@@ -48,8 +51,8 @@ extern_params = {'random_seed'  : 'NA',
                  'trainable3'   : True,
                  # time steps
                  'tglobal'   : 0,
-                 'tmax'      : 3,
-                 'tprint'    : 1,
+                 'nt_max'      : 3,
+                 'nt_print'    : 1,
                  # learning parameters
                  'learning_rate' : 1e-3,
                  'lambda_risa'   : 0,
@@ -58,6 +61,7 @@ extern_params = {'random_seed'  : 'NA',
 #
 # set default values if they are not defined yet
 #
+print(stamp1)
 for k,v in extern_params.items():
     if(not k in globals()):
         if(type(v)==str):
@@ -69,6 +73,7 @@ for k,v in extern_params.items():
     else:
         extern_params[k] = globals()[k]
 #
+print(stamp1)
 
 #       
 # current time stamp
@@ -133,8 +138,8 @@ network_params = {
     'nf_conv3'   : 12,
     'nf_encode3' : 12,
     # filter size and pad size
-    'fs_1' : 7,
-    'fs_2' : 5,
+    'fs_1' : 3,
+    'fs_2' : 3,
     'fs_3' : 3,
     'pool_size' : 2}
 #
@@ -149,12 +154,3 @@ for k,v in network_params.items():
 
 key2 = ['conv', 'encode', 'hidden', 'deconv']
 key3 = ['encode', 'decode']
-
-#
-# setup tensorflow session
-#
-
-if(not 'sess' in locals()):
-    print('create a new interactive session')
-    sess = tf.InteractiveSession()
-#
